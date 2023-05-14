@@ -21,7 +21,9 @@ alias gc="git commit -m"
 alias ga="git add"
 alias gm="git merge"
 alias gs="git status"
+alias gp="git pull"
 alias gsw="git switch"
+alias gcb="git checkout -b"
 
 # Docker
 alias dimgs="docker image ls"
@@ -41,3 +43,8 @@ alias tapply-a="terraform apply -auto-approve"
 
 # AWS SSO
 alias awslogin="aws-sso-util login"
+alias awsconsole="aws-sso-util console launch -a 681941410274 -r dpg-administrator-cf"
+
+# Misc
+alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
+alias myip="curl https://ipinfo.io/ip"
