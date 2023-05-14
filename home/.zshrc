@@ -141,6 +141,9 @@ export LOCALSTACK_API_KEY=1fEPkBGBxu
 # Adding SnowSQL Alias
 alias snowsql=/Applications/SnowSQL.app/Contents/MacOS/snowsql
 
+# Load custom aliases
+source ~/dotfiles/home/.alias
+
 
 # AWS SSO Utils
 export AWS_DEFAULT_REGION=eu-west-1

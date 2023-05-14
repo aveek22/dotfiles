@@ -1,0 +1,15 @@
+
+
+# Kafka
+KAFKA_BIN=~/applications/kafka_2.13-3.2.0/bin
+alias kcc="$KAFKA_BIN/kafka-console-consumer.sh"
+alias kcp="$KAFKA_BIN/kafka-console-producer.sh"
+alias kt="$KAFKA_BIN/kafka-topics.sh"
+alias kcctrpr="$KAFKA_BIN/kafka-console-consumer.sh --bootstrap-server $TR_PROD --topic"
+alias kcctrqa="$KAFKA_BIN/kafka-console-consumer.sh --bootstrap-server $TR_QA --topic"
+
+# Profile Services
+alias kccpspr="$KAFKA_BIN/kafka-console-consumer.sh --bootstrap-server $PS_PROD --topic"
+alias kccpsqa="$KAFKA_BIN/kafka-console-consumer.sh --bootstrap-server $PS_QA --topic"
+alias kcppspr="$KAFKA_BIN/kafka-console-producer.sh --bootstrap-server $PS_PROD --topic"
+alias kcppsqa="$KAFKA_BIN/kafka-console-producer.sh --bootstrap-server $PS_QA --topic"
