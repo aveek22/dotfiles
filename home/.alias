@@ -27,9 +27,13 @@ alias gcb="git checkout -b"
 
 # Docker
 alias dimgs="docker image ls"
+alias dimg="docker image"
+alias dcon="docker container"
 alias dcons="docker container ls"
+alias dnet="docker network"
 alias dnets="docker network ls"
 alias dps="docker ps"
+alias dp="docker pull"
 alias dcup="docker-compose up"
 alias dcdown="docker-compose down"
 
