@@ -13,3 +13,22 @@ alias kccpspr="$KAFKA_BIN/kafka-console-consumer.sh --bootstrap-server $PS_PROD 
 alias kccpsqa="$KAFKA_BIN/kafka-console-consumer.sh --bootstrap-server $PS_QA --topic"
 alias kcppspr="$KAFKA_BIN/kafka-console-producer.sh --bootstrap-server $PS_PROD --topic"
 alias kcppsqa="$KAFKA_BIN/kafka-console-producer.sh --bootstrap-server $PS_QA --topic"
+
+
+
+
+# Docker
+alias dimages="docker image ls"
+alias dcontainers="docker container ls"
+alias dnetworks="docker network ls"
+alias dps="docker ps"
+alias dcup="docker-compose up"
+alias dcdown="docker-compose down"
+
+
+
+# Terraform
+alias tinit="terraform init"
+alias tplan="terraform plan"
+alias tapply="terraform apply"
+alias tapply-a="terraform apply -auto-approve"
