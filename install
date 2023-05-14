@@ -1,0 +1,4 @@
+
+
+# Link files
+ln -s ~/dotfiles/home/.zshrc ~/.zshrc
