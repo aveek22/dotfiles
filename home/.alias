@@ -15,12 +15,18 @@ alias kcppspr="$KAFKA_BIN/kafka-console-producer.sh --bootstrap-server $PS_PROD 
 alias kcppsqa="$KAFKA_BIN/kafka-console-producer.sh --bootstrap-server $PS_QA --topic"
 
 
-
+#Git
+alias g=git
+alias gc="git commit -m"
+alias ga="git add"
+alias gm="git merge"
+alias gs="git status"
+alias gsw="git switch"
 
 # Docker
 alias dimgs="docker image ls"
-alias dcts="docker container ls"
-alias dnetworks="docker network ls"
+alias dcons="docker container ls"
+alias dnets="docker network ls"
 alias dps="docker ps"
 alias dcup="docker-compose up"
 alias dcdown="docker-compose down"
@@ -32,3 +38,6 @@ alias tinit="terraform init"
 alias tplan="terraform plan"
 alias tapply="terraform apply"
 alias tapply-a="terraform apply -auto-approve"
+
+# AWS SSO
+alias awslogin="aws-sso-util login"
