@@ -18,8 +18,8 @@ alias kcppsqa="$KAFKA_BIN/kafka-console-producer.sh --bootstrap-server $PS_QA --
 
 
 # Docker
-alias dimages="docker image ls"
-alias dcontainers="docker container ls"
+alias dimgs="docker image ls"
+alias dcts="docker container ls"
 alias dnetworks="docker network ls"
 alias dps="docker ps"
 alias dcup="docker-compose up"
