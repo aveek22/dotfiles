@@ -26,18 +26,22 @@ alias gsw="git switch"
 alias gcb="git checkout -b"
 
 # Docker
-alias dimgs="docker image ls"
 alias dimg="docker image"
 alias dcon="docker container"
-alias dcons="docker container ls"
 alias dnet="docker network"
+alias dimgs="docker image ls"
+alias dcons="docker container ls"
 alias dnets="docker network ls"
 alias dps="docker ps"
 alias dp="docker pull"
 alias dcup="docker-compose up"
 alias dcdown="docker-compose down"
+alias dexec="docker exec -it"
 
-
+# Python
+alias pyvenv="python -m venv .venv"
+alias pipin="pip install"
+alias pipup="pip install --upgrade pip"
 
 # Terraform
 alias tinit="terraform init"
