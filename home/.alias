@@ -58,12 +58,14 @@ alias awsconsole="aws-sso-util console launch -a 681941410274 -r dpg-administrat
 
 # AWS Profiles
 alias awshome="cd ~/.aws && git restore . && git switch home && cd -"
-alias awswork="cd ~/.aws && git switch work && cd - && awslogin"
+alias awswork="cd ~/.aws && git switch work && cd - && awslogin && export AWS_DEFAULT_PROFILE=data && echo 'Setting default profile to data.'"
 
 # Misc
 alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
 alias myip="curl https://ipinfo.io/ip"
 alias cls=clear
+alias cc=clear
+alias cs=clear
 alias dot="cd ~/dotfiles && code ."
 alias poetry-env-ls="cd ~/Library/Caches/pypoetry/virtualenvs && ll"
 
@@ -76,3 +78,7 @@ alias ps="cd ~/codebase/work/projects/profile-service"
 alias psps="cd ~/codebase/work/projects/profile-service/profile-service"
 alias cds="cd ~/codebase/work/projects/content-data-service"
 alias idmapper="cd ~/codebase/work/projects/profile-service/profile-service/id-mapper"
+alias ss="cd ~/codebase/work/poc/shipit"
+
+# Kubernetes
+alias kube="~/dotfiles/scripts/kube"
