@@ -130,11 +130,6 @@ export TR_QA='b-1.trackingqa.wth04k.c6.kafka.eu-west-1.amazonaws.com:9092,b-3.tr
 export PS_PROD='b-2.profile-service-prod.n0vfm2.c3.kafka.eu-west-1.amazonaws.com:9092,b-1.profile-service-prod.n0vfm2.c3.kafka.eu-west-1.amazonaws.com:9092,b-3.profile-service-prod.n0vfm2.c3.kafka.eu-west-1.amazonaws.com:9092'
 export PS_QA='b-2.profile-service-test.9kbfw2.c3.kafka.eu-west-1.amazonaws.com:9092,b-3.profile-service-test.9kbfw2.c3.kafka.eu-west-1.amazonaws.com:9092,b-1.profile-service-test.9kbfw2.c3.kafka.eu-west-1.amazonaws.com:9092'
 
-export KAFKA_INPUT_BROKER='b-3.trackingprod.qw85m1.c6.kafka.eu-west-1.amazonaws.com:9092,b-1.trackingprod.qw85m1.c6.kafka.eu-west-1.amazonaws.com:9092,b-2.trackingprod.qw85m1.c6.kafka.eu-west-1.amazonaws.com:9092'
-export KAFKA_OUTPUT_BROKER='localhost:9092'
-export OUTPUT_TOPIC='events-with-dmoi'
-export INPUT_TOPIC='snowplow-events'
-
 # LocalStack API Key
 export LOCALSTACK_API_KEY=1fEPkBGBxu
 
