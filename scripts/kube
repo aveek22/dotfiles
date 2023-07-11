@@ -1,0 +1,10 @@
+#!/bin/bash
+options=("dpg-eks-cluster-prod" "dpg-eks-cluster-test" "datafy-dp-eks-dpg-prd")
+select opt in "${options[@]}"
+do
+    echo $opt
+    aws eks --region eu-west-1 update-kubeconfig --name $opt
+    k9s --cluster arn:aws:eks:eu-west-1:681941410274:cluster/$opt
+    date
+    break
+done
