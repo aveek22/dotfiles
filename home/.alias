@@ -52,6 +52,11 @@ alias tplan="terraform plan"
 alias tapply="terraform apply"
 alias tapply-a="terraform apply -auto-approve"
 
+# Python
+alias pyvenv="python -m venv .venv"
+alias pipup="pip install --upgrade pip"
+alias poetry-env-ls="cd ~/Library/Caches/pypoetry/virtualenvs && ll"
+
 # AWS SSO
 alias awslogin="aws-sso-util login"
 alias awsconsole="aws-sso-util console launch -a 681941410274 -r dpg-administrator-cf"
@@ -67,7 +72,6 @@ alias cls=clear
 alias cc=clear
 alias cs=clear
 alias dot="cd ~/dotfiles && code ."
-alias poetry-env-ls="cd ~/Library/Caches/pypoetry/virtualenvs && ll"
 
 # Conveyor
 alias cnv="conveyor"
