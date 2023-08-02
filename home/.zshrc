@@ -139,6 +139,8 @@ alias snowsql=/Applications/SnowSQL.app/Contents/MacOS/snowsql
 # Load custom aliases
 source ~/dotfiles/home/.alias
 
+# Load PlantUML GraphViz
+export GRAPHVIZ_DOT=/opt/homebrew/Cellar/graphviz/8.1.0/bin/dot
 
 # AWS SSO Utils
 export AWS_DEFAULT_REGION=eu-west-1
@@ -150,6 +152,7 @@ export PATH="$(brew --prefix)/opt/findutils/libexec/gnubin":$PATH
 export C_INCLUDE_PATH=/opt/homebrew/Cellar/snappy/1.1.9/include:/opt/homebrew/Cellar/librdkafka/1.9.2/include:/opt/homebrew/Cellar/libpng/1.6.39/include
 export LIBRARY_PATH=/opt/homebrew/Cellar/snappy/1.1.9/lib:/opt/homebrew/Cellar/librdkafka/1.9.2/lib:/opt/homebrew/Cellar/libpng/1.6.39/lib
 export ARTIFACTORY_USER=`cat ~/.netrc | grep login | sed -e 's/login[[:blank:]]*//'`
+export ARTIFACTORY_USERNAME=`cat ~/.netrc | grep login | sed -e 's/login[[:blank:]]*//'` # Required for CDS
 export ARTIFACTORY_PASSWORD=`cat ~/.netrc | grep password | sed -e 's/password[[:blank:]]*//'`
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
