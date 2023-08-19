@@ -38,6 +38,7 @@ alias dcons="docker container ls"
 alias dnets="docker network ls"
 alias dps="docker ps"
 alias dp="docker pull"
+alias dc="docker-compose"
 alias dcup="docker-compose up"
 alias dcdown="docker-compose down"
 alias dexec="docker exec -it"
@@ -50,10 +51,10 @@ alias poetry-env-ls="cd ~/Library/Caches/pypoetry/virtualenvs && ll"
 
 # Terraform
 alias t="terraform"
-alias tinit="terraform init"
-alias tplan="terraform plan"
-alias tapply="terraform apply"
-alias tapply-a="terraform apply -auto-approve"
+alias ti="terraform init"
+alias tp="terraform plan"
+alias ta="terraform apply"
+alias taa="terraform apply -auto-approve"
 
 # AWS SSO
 alias awslogin="aws-sso-util login"
@@ -76,11 +77,9 @@ alias cnv="conveyor"
 alias cnvupd="conveyor update"
 
 # Profilers
-alias ps="cd ~/codebase/work/projects/profile-service"
-alias psps="cd ~/codebase/work/projects/profile-service/profile-service"
+alias psps="cd ~/codebase/work/projects/profile-service"
 alias cds="cd ~/codebase/work/projects/content-data-service"
 alias idmapper="cd ~/codebase/work/projects/profile-service/profile-service/id-mapper"
-alias ss="cd ~/codebase/work/poc/shipit"
 
 # Kubernetes
 alias k="kubectl"
