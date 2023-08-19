@@ -29,6 +29,7 @@ alias gb="git branch"
 alias gf="git fetch"
 
 # Docker
+alias d="docker"
 alias dimg="docker image"
 alias dcon="docker container"
 alias dnet="docker network"
@@ -48,6 +49,7 @@ alias pipup="pip install --upgrade pip"
 alias poetry-env-ls="cd ~/Library/Caches/pypoetry/virtualenvs && ll"
 
 # Terraform
+alias t="terraform"
 alias tinit="terraform init"
 alias tplan="terraform plan"
 alias tapply="terraform apply"
@@ -81,4 +83,5 @@ alias idmapper="cd ~/codebase/work/projects/profile-service/profile-service/id-m
 alias ss="cd ~/codebase/work/poc/shipit"
 
 # Kubernetes
+alias k="kubectl"
 alias kube="~/dotfiles/scripts/kube"
