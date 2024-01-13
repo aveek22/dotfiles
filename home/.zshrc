@@ -8,8 +8,8 @@ export ZSH="$HOME/.oh-my-zsh"
 # load a random theme each time oh-my-zsh is loaded, in which case,
 # to know which specific one was loaded, run: echo $RANDOM_THEME
 # See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
-ZSH_THEME="robbyrussell"
-# ZSH_THEME="agnoster"
+# ZSH_THEME="robbyrussell"
+ZSH_THEME="agnoster"
 
 # Set list of themes to pick from when loading at random
 # Setting this variable when ZSH_THEME=random will cause zsh to load
@@ -71,7 +71,7 @@ ZSH_THEME="robbyrussell"
 # Custom plugins may be added to $ZSH_CUSTOM/plugins/
 # Example format: plugins=(rails git textmate ruby lighthouse)
 # Add wisely, as too many plugins slow down shell startup.
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting emoji dirhistory)
 
 source $ZSH/oh-my-zsh.sh
 
@@ -100,6 +100,7 @@ source $ZSH/oh-my-zsh.sh
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
+export DEFAULT_USER="aveek"
 export PATH="/opt/homebrew/opt/postgresql@13/bin:$PATH"
 
 # Adding support for Terraform from TfSwitch
@@ -154,6 +155,12 @@ export LIBRARY_PATH=/opt/homebrew/Cellar/snappy/1.1.9/lib:/opt/homebrew/Cellar/l
 export ARTIFACTORY_USER=`cat ~/.netrc | grep login | sed -e 's/login[[:blank:]]*//'`
 export ARTIFACTORY_USERNAME=`cat ~/.netrc | grep login | sed -e 's/login[[:blank:]]*//'` # Required for CDS
 export ARTIFACTORY_PASSWORD=`cat ~/.netrc | grep password | sed -e 's/password[[:blank:]]*//'`
+
+# Tere Settings
+tere() {
+    local result=$(command tere "$@")
+    [ -n "$result" ] && cd -- "$result"
+}
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
