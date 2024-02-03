@@ -85,3 +85,11 @@ alias idmapper="cd ~/codebase/work/projects/profile-service/profile-service/id-m
 # Kubernetes
 alias k="kubectl"
 alias kube="~/dotfiles/scripts/kube"
+
+# Draw
+alias draw="code /Users/adas/codebase/personal/project-bunch/excelidraw"
+
+# SBT and Scala
+alias scc="sbt clean compile"
+alias st="sbt test"
+alias sa="sbt assembly"
