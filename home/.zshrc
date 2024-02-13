@@ -113,8 +113,14 @@ eval "$(pyenv init -)"
 # Adding Kafka binaries to path
 export PATH="$PATH:/Users/adas/Applications/kafka_2.13-3.2.0/bin"
 
+# Add XDG Config Variable, used by k9s skin
+export XDG_CONFIG_HOME="/Users/adas/.xdg/config/"
+
 # Adding poetry to path
 export PATH="$PATH:/Users/adas/Library/Application Support/pypoetry/venv/bin"
+
+# Terraform cache directory
+export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
 
 
 # Adding Flink base path
