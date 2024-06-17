@@ -78,9 +78,9 @@ alias cnv="conveyor"
 alias cnvupd="conveyor update"
 
 # Profilers
-alias psps="cd ~/codebase/work/projects/profile-service"
-alias cds="cd ~/codebase/work/projects/content-data-service"
-alias idmapper="cd ~/codebase/work/projects/profile-service/profile-service/id-mapper"
+alias psps="cd ~/codebase/work/profilers/profile-service"
+alias cds="cd ~/codebase/work/profilers/content-data-service"
+alias idmapper="cd ~/codebase/work/profilers/profile-service/profile-service/id-mapper"
 
 # Kubernetes
 alias k="kubectl"
