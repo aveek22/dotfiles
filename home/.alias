@@ -60,6 +60,9 @@ alias taa="terraform apply -auto-approve"
 # AWS SSO
 alias awslogin="aws-sso-util login"
 alias awsconsole="aws-sso-util console launch -a 681941410274 -r dpg-administrator-cf"
+alias aws-data="awslogin && export AWS_PROFILE=dpg-data"
+alias aws-rsprod="awslogin && export AWS_PROFILE=rs-prod"
+alias aws-rstest="awslogin && export AWS_PROFILE=rs-test"
 
 # AWS Profiles
 alias awshome="cd ~/.aws && git restore . && git switch home && cd -"
