@@ -75,6 +75,7 @@ alias cls=clear
 alias cc=clear
 alias cs=clear
 alias dotfiles="cd ~/dotfiles && code ."
+alias pwdc="pwd | pbcopy"
 
 # Conveyor
 alias cnv="conveyor"
