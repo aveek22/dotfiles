@@ -65,6 +65,7 @@ alias aws-rsprod="awslogin && export AWS_PROFILE=rs-prod"
 alias aws-rstest="awslogin && export AWS_PROFILE=rs-test"
 
 # AWS Profiles
+alias aws-d92="export AWS_DEFAULT_PROFILE=aveek-d92 && export AWS_PROFILE=aveek-d92"
 alias awshome="cd ~/.aws && git restore . && git switch home && cd -"
 alias awswork="cd ~/.aws && git switch work && cd - && awslogin && export AWS_DEFAULT_PROFILE=data && echo 'Setting default profile to data.'"
 
