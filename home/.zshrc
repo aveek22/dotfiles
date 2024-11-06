@@ -147,7 +147,7 @@ alias snowsql=/Applications/SnowSQL.app/Contents/MacOS/snowsql
 source ~/dotfiles/home/.alias
 
 # Load PlantUML GraphViz
-export GRAPHVIZ_DOT=/opt/homebrew/Cellar/graphviz/12.1.2/bin/dot
+export GRAPHVIZ_DOT=/opt/homebrew/Cellar/graphviz/12.2.0/bin/dot
 
 # AWS SSO Utils
 export AWS_DEFAULT_REGION=eu-west-1
