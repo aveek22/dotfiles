@@ -111,7 +111,7 @@ command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
 eval "$(pyenv init -)"
 
 # JMeter Home
-export JMETER_HOME="/opt/homebrew/Cellar/jmeter/5.6.3/bin"
+export JMETER_HOME="/Users/adas/applications/apache-jmeter-5.6.3/bin"
 
 # Adding Kafka binaries to path
 export PATH="$PATH:/Users/adas/Applications/kafka_2.13-3.2.0/bin"
