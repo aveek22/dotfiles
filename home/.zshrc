@@ -134,6 +134,9 @@ export FLINK_HOME='/Users/adas/applications/flink-1.15.0/bin/'
 #Add Idea to PATH
 export PATH="$PATH:/Applications/IntelliJ IDEA.app/Contents/MacOS"
 
+# Add support for airflow development using uv and breeze
+export PATH="/Users/adas/.local/bin:$PATH"
+
 
 # Adding Kafka Bootstrap Servers
 export TR_PROD='b-3.trackingprod.qw85m1.c6.kafka.eu-west-1.amazonaws.com:9092,b-1.trackingprod.qw85m1.c6.kafka.eu-west-1.amazonaws.com:9092,b-2.trackingprod.qw85m1.c6.kafka.eu-west-1.amazonaws.com:9092'
@@ -175,3 +178,6 @@ tere() {
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
+# START: Added by Updated Airflow Breeze autocomplete setup
+source /Users/adas/codebase/personal/contrib/airflow/dev/breeze/autocomplete/breeze-complete-zsh.sh
+# END: Added by Updated Airflow Breeze autocomplete setup
