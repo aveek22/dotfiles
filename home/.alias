@@ -92,7 +92,7 @@ alias k="kubectl"
 alias kube="~/dotfiles/scripts/kube"
 
 # Draw
-alias draw="code /Users/adas/codebase/personal/project-bunch/excelidraw"
+alias draw="code /Users/adas/codebase/personal/project-bunch/excalidraw"
 
 # SBT and Scala
 alias scc="sbt clean compile"
