@@ -92,7 +92,7 @@ alias k="kubectl"
 alias kube="~/dotfiles/scripts/kube"
 
 # Project Bunch
-alias pbcode="code /Users/adas/codebase/personal/project-bunch/excalidraw"
+alias pbcode="code /Users/adas/codebase/personal/project-bunch"
 
 # Draw
 alias draw="code /Users/adas/codebase/personal/project-bunch/excalidraw"
