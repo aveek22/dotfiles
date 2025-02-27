@@ -91,6 +91,9 @@ alias idmapper="cd ~/codebase/work/profilers/profile-service/profile-service/id-
 alias k="kubectl"
 alias kube="~/dotfiles/scripts/kube"
 
+# Project Bunch
+alias pbcode="code /Users/adas/codebase/personal/project-bunch/excalidraw"
+
 # Draw
 alias draw="code /Users/adas/codebase/personal/project-bunch/excalidraw"
 
