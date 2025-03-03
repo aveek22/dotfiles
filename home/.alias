@@ -1,7 +1,7 @@
 
 
 # Kafka
-KAFKA_BIN=~/applications/kafka_2.13-3.2.0/bin
+KAFKA_BIN=~/applications/kafka_2.13-3.9.0/bin
 alias kcc="$KAFKA_BIN/kafka-console-consumer.sh"
 alias kcp="$KAFKA_BIN/kafka-console-producer.sh"
 alias kt="$KAFKA_BIN/kafka-topics.sh"

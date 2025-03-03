@@ -115,7 +115,7 @@ export JMETER_HOME="/Users/adas/applications/apache-jmeter-5.6.3/bin"
 export PATH="$PATH:$JMETER_HOME"
 
 # Adding Kafka binaries to path
-export PATH="$PATH:/Users/adas/Applications/kafka_2.13-3.2.0/bin"
+export PATH="$PATH:/Users/adas/Applications/kafka_2.13-3.9.0/bin"
 
 # Add XDG Config Variable, used by k9s skin
 export XDG_CONFIG_HOME="/Users/adas/.xdg/config/"
