@@ -51,7 +51,7 @@ alias poetry-env-ls="cd ~/Library/Caches/pypoetry/virtualenvs && ll"
 
 # Terraform
 alias t="terraform"
-alias ti="terraform init"
+alias ti="terraform init --upgrade"
 alias tp="terraform plan"
 alias ta="terraform apply"
 alias taa="terraform apply -auto-approve"
