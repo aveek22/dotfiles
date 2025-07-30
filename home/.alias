@@ -93,6 +93,8 @@ alias idmapper="cd ~/codebase/work/profilers/profile-service/profile-service/id-
 # Kubernetes
 alias k="kubectl"
 alias kube="~/dotfiles/scripts/kube"
+alias kp="kubectl config use-context rs-prod"
+alias kt="kubectl config use-context rs-test"
 
 # Project Bunch
 alias pbcode="code /Users/adas/codebase/personal/project-bunch"
