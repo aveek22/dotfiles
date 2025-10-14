@@ -89,6 +89,7 @@ alias cnvupd="conveyor update"
 alias psps="cd ~/codebase/work/profilers/profile-service"
 alias cds="cd ~/codebase/work/profilers/content-data-service"
 alias idmapper="cd ~/codebase/work/profilers/profile-service/profile-service/id-mapper"
+alias cifailed="ap && python /Users/adas/codebase/work/profilers/profile-service/platform/scripts/retry-codestar-connection-failures/retry-failed-pipelines.py --pipeline-postfix=-release"
 
 # Kubernetes
 alias k="kubectl"
