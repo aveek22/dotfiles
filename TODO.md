@@ -1,0 +1,4 @@
+[ ] Add support to cleanup poetry environments
+[ ] Add support to cleanup docker cache
+[ ] Add support to cleanup Maven cache
+[ ] Investigate if there are other caches to clean up? 
