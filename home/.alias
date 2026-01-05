@@ -86,10 +86,10 @@ alias cnv="conveyor"
 alias cnvupd="conveyor update"
 
 # Profilers
-alias psps="cd ~/codebase/work/profilers/profile-service"
-alias cds="cd ~/codebase/work/profilers/content-data-service"
-alias idmapper="cd ~/codebase/work/profilers/profile-service/profile-service/id-mapper"
-alias cifailed="ap && python /Users/adas/codebase/work/profilers/profile-service/platform/scripts/retry-codestar-connection-failures/retry-failed-pipelines.py --pipeline-postfix=-release"
+alias psps="cd ~/codebase/work/github/profile-service"
+alias cds="cd ~/codebase/work/github/content-data-service"
+alias idmapper="cd ~/codebase/work/github/profile-service/profile-service/id-mapper"
+alias cifailed="ap && python /Users/adas/codebase/work/github/profile-service/platform/scripts/retry-codestar-connection-failures/retry-failed-pipelines.py --pipeline-postfix=-release"
 
 # Kubernetes
 alias k="kubectl"
@@ -98,6 +98,7 @@ alias kp="kubectl config use-context rs-prod"
 alias kt="kubectl config use-context rs-test"
 
 # Project Bunch
+alias pb="cd ~/codebase/personal/project-bunch"
 alias pbcode="code /Users/adas/codebase/personal/project-bunch"
 
 # Draw
