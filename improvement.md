@@ -727,11 +727,315 @@ echo "✅ Cleanup complete!"
 - [ ] Schedule monthly cleanup reminder
 - [ ] Track cache sizes before/after
 
+### 13. Unversioned Configuration Files Audit - **CRITICAL DISCOVERY**
+
+**Problem:** Based on `.zshrc` analysis, multiple configuration directories and files exist outside dotfiles repository.
+
+**Impact:** These configs are not backed up, not versioned, and will be lost on machine migration.
+
+**Discovered Configurations:**
+
+#### A. XDG Config Directory
+```bash
+# Currently set in .zshrc
+export XDG_CONFIG_HOME="/Users/adas/.xdg/config/"
+```
+
+**Tools using XDG_CONFIG_HOME:**
+- **k9s** - Kubernetes CLI manager (skin configuration)
+- Potentially other tools following XDG Base Directory specification
+
+**Action Required:**
+```bash
+# Add to dotfiles structure
+dotfiles/
+├── xdg/
+│   └── config/
+│       └── k9s/
+│           ├── skin.yml          # K9s color scheme
+│           ├── config.yml         # K9s settings
+│           └── hotkeys.yml        # Custom keybindings
+```
+
+**Symlink in install script:**
+```bash
+mkdir -p ~/.xdg/config
+ln -s ~/dotfiles/xdg/config/k9s ~/.xdg/config/k9s
+```
+
+#### B. AWS Configuration - **SENSITIVE**
+```bash
+# Referenced in .zshrc
+~/.aws/
+  ├── config              # AWS profiles and settings
+  ├── credentials         # AWS access keys (DO NOT VERSION)
+  └── ... (git-managed per .zshrc aliases)
+```
+
+**Current State:** You manage `~/.aws` with Git (see aliases: `awshome`, `awswork`)
+
+**Recommendations:**
+- [ ] Document the `~/.aws` Git workflow in README
+- [ ] Add `~/.aws/credentials` to `.gitignore` (if not already)
+- [ ] Create template `config` file without sensitive data
+- [ ] Add to backup script (encrypted backup only)
+
+#### C. Kubernetes Configuration - **SENSITIVE**
+```bash
+~/.kube/
+  ├── config              # K8s cluster contexts (CONTAINS CERTIFICATES)
+  ├── cache/
+  └── http-cache/
+```
+
+**Security Risk:** Contains cluster certificates and tokens
+
+**Action Required:**
+```bash
+# Create sanitized template
+dotfiles/
+├── kube/
+│   ├── config.template     # Sanitized structure
+│   └── README.md          # Setup instructions
+```
+
+**DO NOT version actual `~/.kube/config` - contains secrets!**
+
+#### D. Terraform Configuration
+```bash
+# Already referenced in .zshrc
+~/.terraform.d/
+  ├── plugin-cache/       # Cached plugins (excluded from version control)
+  ├── plugins/
+  └── credentials.tfrc.json  # Terraform Cloud token (DO NOT VERSION)
+```
+
+**Action Required:**
+```bash
+dotfiles/
+├── terraform/
+│   ├── terraformrc         # Global terraform settings
+│   └── README.md          # Document plugin cache setup
+```
+
+#### E. Build Tool Configurations (Already Noted in Section 11)
+```bash
+~/.m2/              # Maven (SDKMAN managed)
+  └── settings.xml
+
+~/.gradle/          # Gradle (SDKMAN managed)
+  └── gradle.properties
+
+~/.sbt/             # SBT (SDKMAN managed)
+  ├── repositories
+  └── plugins/
+```
+
+#### F. Additional Unversioned Configs
+
+**Python Configs:**
+```bash
+~/.pyenv/
+  └── version           # Global Python version (should version)
+
+~/.config/pypoetry/   # Poetry config (if exists)
+  └── config.toml
+```
+
+**Git Configs (Missing Entirely):**
+```bash
+~/.gitconfig          # NOT VERSIONED - Critical!
+~/.gitignore_global   # NOT VERSIONED - Critical!
+```
+
+**Shell Configs (Partially Versioned):**
+```bash
+~/.netrc              # Artifactory credentials - SECURITY RISK
+~/.zshenv             # Empty but should be used
+~/.zshrc              # ✓ Already versioned
+~/.alias              # ✓ Already versioned
+```
+
+**Other Potential Configs:**
+```bash
+~/.vimrc              # Vim configuration (if you use vim)
+~/.tmux.conf          # Already mentioned in Brewfile (tmux installed)
+~/.editorconfig       # Cross-editor configuration
+~/.curlrc             # curl defaults
+~/.wgetrc             # wget defaults
+~/.docker/config.json # Docker registry auth (SENSITIVE)
+```
+
+**Application-Specific:**
+```bash
+~/Library/Application Support/pypoetry/  # Poetry venv location
+/Applications/IntelliJ IDEA.app/         # IDE path in PATH
+```
+
+#### G. SDKMAN Configuration
+```bash
+~/.sdkman/
+  ├── etc/
+  │   └── config        # SDKMAN settings (should version preferences)
+  ├── candidates/       # Installed versions (do not version)
+  └── archives/         # Downloaded archives (do not version)
+```
+
+**Action Required:**
+```bash
+dotfiles/
+├── sdkman/
+│   └── config        # Version SDKMAN preferences
+```
+
+**Implementation Plan:**
+
+**Phase 1: Critical Security (Immediate)**
+- [ ] Audit `~/.netrc` permissions (should be 600)
+- [ ] Move `.netrc` to encrypted secrets storage
+- [ ] Verify `~/.kube/config` is not in any Git repo
+- [ ] Verify `~/.aws/credentials` is not in any Git repo
+- [ ] Check `~/.docker/config.json` for registry credentials
+
+**Phase 2: Essential Configs (Week 1)**
+- [ ] Create `.gitconfig` and `.gitignore_global` (Priority #1)
+- [ ] Export k9s configuration from `~/.xdg/config/k9s/`
+- [ ] Create SDKMAN config template
+- [ ] Document AWS/Kube config workflows
+- [ ] Create `.editorconfig` for consistent formatting
+
+**Phase 3: Build Tools (Week 2)**
+- [ ] Export Maven `settings.xml` (sanitize credentials)
+- [ ] Export Gradle `gradle.properties`
+- [ ] Export SBT configurations
+- [ ] Create Poetry `config.toml` if customized
+
+**Phase 4: Shell Enhancements (Week 2)**
+- [ ] Create `.zshenv` for environment variables
+- [ ] Create `.vimrc` if using vim
+- [ ] Create `.tmux.conf` for tmux configuration
+- [ ] Create `.curlrc` and `.wgetrc` if needed
+
+**Phase 5: Documentation (Week 3)**
+- [ ] Document all unversioned configs in README
+- [ ] Create migration guide
+- [ ] Document secret management workflow
+- [ ] Create config audit script
+
+**Recommended Dotfiles Structure (Complete):**
+```bash
+dotfiles/
+├── README.md
+├── TODO.md
+├── improvement.md
+├── install.sh              # NEW: Idempotent installer
+├── backup.sh               # NEW: Backup script
+├── cleanup.sh              # NEW: Cache cleanup
+├── validate.sh             # NEW: Installation validator
+│
+├── brew/
+│   └── Brewfile
+│
+├── home/                   # Existing
+│   ├── .zshrc
+│   ├── .zshenv            # NEW: Environment variables
+│   ├── .alias
+│   ├── .gitconfig         # NEW: Git configuration
+│   ├── .gitignore_global  # NEW: Global Git ignores
+│   ├── .editorconfig      # NEW: Editor settings
+│   ├── .vimrc             # NEW: Vim config (optional)
+│   ├── .tmux.conf         # NEW: Tmux config (optional)
+│   └── .ssh/
+│       └── config
+│
+├── xdg/                    # NEW: XDG configs
+│   └── config/
+│       └── k9s/
+│           ├── skin.yml
+│           ├── config.yml
+│           └── hotkeys.yml
+│
+├── sdkman/                 # NEW: SDKMAN config
+│   └── config
+│
+├── maven/                  # NEW: Build tools
+│   └── settings.xml
+│
+├── gradle/                 # NEW
+│   └── gradle.properties
+│
+├── sbt/                    # NEW
+│   ├── repositories
+│   └── plugins/
+│       └── plugins.sbt
+│
+├── terraform/              # NEW
+│   └── terraformrc
+│
+├── kube/                   # NEW: Templates only
+│   ├── config.template
+│   └── README.md
+│
+├── aws/                    # NEW: Templates only
+│   ├── config.template
+│   └── README.md
+│
+├── python/                 # NEW
+│   └── poetry/
+│       └── config.toml
+│
+├── golang/                 # NEW
+│   └── .editorconfig
+│
+├── scripts/                # Existing
+│   ├── kube
+│   ├── oh-my-zsh/
+│   ├── k8s-utils.sh       # NEW
+│   └── backup.sh          # NEW
+│
+├── macos/                  # NEW
+│   └── defaults.sh
+│
+├── idea/                   # NEW: IDE settings
+│   ├── settings.zip
+│   └── templates/
+│
+├── vscode/                 # NEW
+│   ├── settings.json
+│   └── extensions.txt
+│
+├── itermcolors/           # Existing
+│
+└── target/                # Existing
+```
+
+**Security Checklist for Configs:**
+```bash
+# Files that MUST NOT be versioned (add to .gitignore)
+**/*credentials*
+**/*secrets*
+**/.netrc
+~/.kube/config
+~/.aws/credentials
+~/.docker/config.json
+~/.terraform.d/credentials.tfrc.json
+**/*.pem
+**/*.key
+**/id_rsa*
+**/*.p12
+
+# Files with permissions checks
+chmod 600 ~/.netrc
+chmod 600 ~/.ssh/config
+chmod 600 ~/.kube/config
+chmod 600 ~/.aws/credentials
+```
+
 ---
 
 ## 🔵 NICE TO HAVE IMPROVEMENTS (Priority 4)
 
-### 13. Development Environment Documentation
+### 14. Development Environment Documentation
 
 **Enhanced README Structure:**
 ```markdown
@@ -752,7 +1056,7 @@ echo "✅ Cleanup complete!"
 ## FAQ
 ```
 
-### 14. Testing & Validation
+### 15. Testing & Validation
 
 **Create `tests/validate.sh`:**
 ```bash
@@ -764,20 +1068,27 @@ echo "🔍 Validating installation..."
 # Check symlinks
 test -L ~/.zshrc || echo "❌ .zshrc not linked"
 test -L ~/.ssh/config || echo "❌ SSH config not linked"
+test -L ~/.gitconfig || echo "❌ .gitconfig not linked"
 
 # Check tools
 command -v pyenv >/dev/null || echo "❌ pyenv not found"
-command -v jenv >/dev/null || echo "❌ jenv not found"
+command -v sdk >/dev/null || echo "❌ SDKMAN not found"
+command -v goenv >/dev/null || echo "❌ goenv not found"
 command -v docker >/dev/null || echo "❌ docker not found"
 command -v kubectl >/dev/null || echo "❌ kubectl not found"
 
-# Check Java versions
-jenv versions | grep -q "17.0" || echo "⚠️ Java 17 not installed"
+# Check Java versions via SDKMAN
+sdk list java | grep -q "17.0" || echo "⚠️ Java 17 not installed via SDKMAN"
+
+# Check config files
+test -f ~/.gitconfig || echo "❌ .gitconfig missing"
+test -f ~/.gitignore_global || echo "❌ .gitignore_global missing"
+test -d ~/.xdg/config || echo "⚠️ XDG_CONFIG_HOME not set up"
 
 echo "✅ Validation complete"
 ```
 
-### 15. Containerized Development Environment
+### 16. Containerized Development Environment
 
 **Create `Dockerfile` for reproducible environments:**
 ```dockerfile
@@ -791,7 +1102,7 @@ RUN cd /root/dotfiles && ./install.sh
 CMD ["zsh"]
 ```
 
-### 16. Brewfile Organization
+### 17. Brewfile Organization
 
 **Split into categories:**
 ```
@@ -809,39 +1120,49 @@ brew/
 ## 📋 IMMEDIATE ACTION PLAN
 
 ### Week 1: Security & Critical Setup
+- [ ] **DAY 1:** Audit unversioned configs (Section 13 - run security checklist)
 - [ ] **DAY 1:** Remove LOCALSTACK_API_KEY from Git history
-- [ ] **DAY 1:** Set up SOPS for secret management
-- [ ] **DAY 2:** Configure SDKMAN with multiple Java/Scala versions
-- [ ] **DAY 3:** Set up Golang environment with goenv
-- [ ] **DAY 4:** Create `.gitconfig` and `.gitignore_global`
-- [ ] **DAY 5:** Build idempotent `install.sh`
+- [ ] **DAY 1:** Move `.netrc` to encrypted secrets storage (SOPS)
+- [ ] **DAY 2:** Create `.gitconfig` and `.gitignore_global` (CRITICAL)
+- [ ] **DAY 2:** Export k9s config from `~/.xdg/config/k9s/`
+- [ ] **DAY 3:** Configure SDKMAN with multiple Java/Scala versions
+- [ ] **DAY 4:** Set up Golang environment with goenv
+- [ ] **DAY 5:** Build idempotent `install.sh` with config symlinks
 
-### Week 2: Development Tooling
-- [ ] **DAY 1:** Add enhanced K8s tools (kubectx, stern, etc.)
-- [ ] **DAY 2:** Enhance Python setup (pipx, pyenv-virtualenv)
-- [ ] **DAY 3:** Install and configure Go development tools
-- [ ] **DAY 4:** Add modern CLI tools (fzf, ripgrep, bat, zoxide)
-- [ ] **DAY 5:** Create build tool configurations (Maven, Gradle, SBT) via SDKMAN
+### Week 2: Development Tooling & Configs
+- [ ] **DAY 1:** Export Maven, Gradle, SBT configurations
+- [ ] **DAY 2:** Add enhanced K8s tools (kubectx, stern, etc.)
+- [ ] **DAY 2:** Create `.editorconfig`, `.tmux.conf`, `.vimrc`
+- [ ] **DAY 3:** Enhance Python setup (pipx, pyenv-virtualenv)
+- [ ] **DAY 3:** Export Poetry config if customized
+- [ ] **DAY 4:** Install and configure Go development tools
+- [ ] **DAY 5:** Add modern CLI tools (fzf, ripgrep, bat, zoxide)
 
-### Week 3: Maintenance & Polish
-- [ ] **DAY 1:** Create cleanup scripts (Docker, Maven, Go cache)
-- [ ] **DAY 2:** Set up backup strategy
-- [ ] **DAY 3:** Export IDE configurations (IntelliJ for Java/Scala/Go, VSCode)
+### Week 3: Maintenance, Documentation & Validation
+- [ ] **DAY 1:** Create cleanup scripts (Docker, Maven, Go, SDKMAN cache)
+- [ ] **DAY 2:** Set up backup strategy (include XDG configs)
+- [ ] **DAY 3:** Export IDE configurations (IntelliJ, VSCode)
 - [ ] **DAY 4:** Configure macOS defaults
-- [ ] **DAY 5:** Document all workflows and create validation tests
+- [ ] **DAY 5:** Create validation script and test full installation
 
 ---
 
 ## 🛡️ SECURITY CHECKLIST
 
-- [ ] No API keys in version control
-- [ ] Secrets encrypted with SOPS or 1Password
+- [ ] No API keys in version control (check LOCALSTACK_API_KEY)
+- [ ] `.netrc` moved to encrypted secrets (SOPS or 1Password)
 - [ ] `.netrc` file permissions set to 600
-- [ ] SSH key permissions set to 600
+- [ ] SSH key permissions set to 600 (`chmod 600 ~/.ssh/*`)
+- [ ] `~/.kube/config` not in any Git repository
+- [ ] `~/.aws/credentials` not in any Git repository
+- [ ] `~/.docker/config.json` checked for registry credentials
+- [ ] Terraform credentials not versioned
 - [ ] Pre-commit hooks prevent committing secrets
+- [ ] `.gitignore` includes all credential patterns
 - [ ] Regular security audit of exposed credentials
 - [ ] Two-factor authentication on all services
 - [ ] SSH keys rotated annually
+- [ ] XDG configs audited for sensitive data
 
 ---
 
@@ -849,17 +1170,20 @@ brew/
 
 ### Before vs After Comparison
 
-| Metric                    | Before             | Target                     |
-| ------------------------- | ------------------ | -------------------------- |
-| **Fresh Install Time**    | Unknown/Manual     | < 30 minutes automated     |
-| **Tools Managed**         | ~40                | 70+                        |
-| **Version Managers**      | 2 (pyenv, sdkman)  | 4 (pyenv, sdkman, goenv)   |
-| **Languages Supported**   | Python, Java/Scala | Python, Java/Scala, Go     |
-| **Documented Workflows**  | Minimal            | Comprehensive              |
-| **IDE Configs Versioned** | 0                  | All (IDEA, VSCode, GoLand) |
-| **Security Issues**       | 1+ exposed keys    | 0                          |
-| **Cleanup Automation**    | Manual             | Automated                  |
-| **Backup Strategy**       | None               | Weekly automated           |
+| Metric                     | Before                  | Target                       |
+| -------------------------- | ----------------------- | ---------------------------- |
+| **Fresh Install Time**     | Unknown/Manual          | < 30 minutes automated       |
+| **Tools Managed**          | ~40                     | 70+                          |
+| **Version Managers**       | 2 (pyenv, sdkman)       | 4 (pyenv, sdkman, goenv)     |
+| **Languages Supported**    | Python, Java/Scala      | Python, Java/Scala, Go       |
+| **Versioned Config Files** | 4 (.zshrc, .alias, etc) | 20+ (all critical configs)   |
+| **XDG Configs Versioned**  | 0                       | k9s, others as discovered    |
+| **Build Tool Configs**     | 0                       | Maven, Gradle, SBT           |
+| **Documented Workflows**   | Minimal                 | Comprehensive                |
+| **IDE Configs Versioned**  | 0                       | All (IDEA, VSCode, GoLand)   |
+| **Security Issues**        | 2+ exposed keys         | 0                            |
+| **Cleanup Automation**     | Manual                  | Automated (6 ecosystems)     |
+| **Backup Strategy**        | None                    | Weekly automated + encrypted |
 
 ---
 
@@ -1047,35 +1371,53 @@ go mod download
 
 ## CONCLUSION
 
-Your dotfiles foundation is solid for Python/AWS/K8s work but needs enhancements for **JVM tooling** (SDKMAN optimization), **Golang support**, and **security hardening** for a senior multi-language engineer role.
+Your dotfiles foundation is solid for Python/AWS/K8s work but **critical configuration audit reveals 15+ unversioned config files** that need immediate attention alongside **JVM tooling optimization**, **Golang support**, and **security hardening**.
 
 ### What You Already Have ✅
 - SDKMAN installed and initialized
 - Poetry and UV configured for Python
-- Comprehensive AWS/K8s tooling
+- Comprehensive AWS/K8s tooling (with k9s using XDG config)
 - Good Docker workflow
+- Basic shell configuration
+
+### Critical Discoveries from Config Audit 🔍
+- **XDG Config:** `~/.xdg/config/k9s/` contains unversioned k9s settings
+- **Git Configs:** `.gitconfig` and `.gitignore_global` completely missing
+- **Build Tools:** Maven, Gradle, SBT configs not versioned
+- **Security Risks:** `.netrc` with plaintext credentials, LOCALSTACK_API_KEY exposed
+- **SDKMAN Config:** Preferences not versioned
+- **Shell:** `.zshenv` empty but should contain environment variables
 
 ### What's Needed 🔧
-- **SDKMAN:** Install multiple Java/Scala versions, configure `.sdkmanrc`
-- **Golang:** Complete setup with goenv, tools, and aliases
-- **Security:** Remove exposed API keys, set up SOPS
-- **Git:** Version control your `.gitconfig` and `.gitignore_global`
-- **Automation:** Idempotent install script, cleanup automation
+
+**Immediate (Week 1):**
+1. **Security Audit:** Fix exposed secrets (.netrc, LOCALSTACK_API_KEY)
+2. **Git Configs:** Create and version .gitconfig, .gitignore_global (CRITICAL)
+3. **XDG Configs:** Export k9s configurations
+4. **SDKMAN:** Install multiple Java/Scala versions, configure project defaults
+
+**Short-term (Week 2-3):**
+5. **Golang:** Complete setup with goenv, tools, and aliases
+6. **Build Tools:** Version Maven/Gradle/SBT configurations
+7. **Shell:** Populate .zshenv, create .editorconfig, .tmux.conf
+8. **Automation:** Idempotent install script with all config symlinks
 
 The improvements above will create a:
 
 ✅ **Production-grade dotfiles setup**  
 ✅ **Multi-language development environment** (Java, Scala, Python, Go)  
-✅ **Reproducible across machines**  
-✅ **Secure secret management**  
-✅ **Comprehensive automation**  
-✅ **Well-documented workflow**
+✅ **20+ versioned configuration files** (vs current 4)  
+✅ **Reproducible across machines** in < 30 minutes  
+✅ **Secure secret management** (zero exposed credentials)  
+✅ **Comprehensive automation** (install, backup, cleanup, validation)  
+✅ **Well-documented workflow** with troubleshooting guides
 
 Start with the **Week 1 Critical Actions** focusing on:
-1. Security fixes (remove LOCALSTACK_API_KEY)
-2. SDKMAN multi-version setup
-3. Golang environment configuration
-4. Git configuration versioning
+1. **Config Audit** - Identify and secure all unversioned configs (Section 13)
+2. **Security fixes** - Remove LOCALSTACK_API_KEY, encrypt .netrc
+3. **Git setup** - Create .gitconfig and .gitignore_global
+4. **SDKMAN** - Multi-version Java/Scala setup with .sdkmanrc
+5. **XDG export** - Version k9s and other XDG-based configs
 
 **Estimated Implementation Time:** 3-4 weeks (1-2 hours daily)  
 **Maintenance Overhead:** ~1 hour monthly once established
