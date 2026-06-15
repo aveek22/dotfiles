@@ -101,7 +101,6 @@ source $ZSH/oh-my-zsh.sh
 # alias zshconfig="mate ~/.zshrc"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
 export DEFAULT_USER="aveek"
-export PATH="/opt/homebrew/opt/postgresql@13/bin:$PATH"
 
 # Adding support for Terraform from TfSwitch
 export PATH="$PATH:/Users/adas/bin"
@@ -126,29 +125,14 @@ export PATH="$PATH:/Users/adas/Library/Application Support/pypoetry/venv/bin"
 # Terraform cache directory
 export TF_PLUGIN_CACHE_DIR="$HOME/.terraform.d/plugin-cache"
 
-
-# Adding Flink base path
-export flink_path='/Users/adas/applications/flink-1.15.0/'
-export FLINK_HOME='/Users/adas/applications/flink-1.15.0/bin/'
-
 #Add Idea to PATH
 export PATH="$PATH:/Applications/IntelliJ IDEA.app/Contents/MacOS"
 
 # Add support for airflow development using uv and breeze
 export PATH="/Users/adas/.local/bin:$PATH"
 
-
-# Adding Kafka Bootstrap Servers
-export TR_PROD='b-3.trackingprod.qw85m1.c6.kafka.eu-west-1.amazonaws.com:9092,b-1.trackingprod.qw85m1.c6.kafka.eu-west-1.amazonaws.com:9092,b-2.trackingprod.qw85m1.c6.kafka.eu-west-1.amazonaws.com:9092'
-export TR_QA='b-1.trackingqa.wth04k.c6.kafka.eu-west-1.amazonaws.com:9092,b-3.trackingqa.wth04k.c6.kafka.eu-west-1.amazonaws.com:9092,b-2.trackingqa.wth04k.c6.kafka.eu-west-1.amazonaws.com:9092'
-export PS_PROD='b-2.profile-service-prod.n0vfm2.c3.kafka.eu-west-1.amazonaws.com:9092,b-1.profile-service-prod.n0vfm2.c3.kafka.eu-west-1.amazonaws.com:9092,b-3.profile-service-prod.n0vfm2.c3.kafka.eu-west-1.amazonaws.com:9092'
-export PS_QA='b-2.profile-service-test.9kbfw2.c3.kafka.eu-west-1.amazonaws.com:9092,b-3.profile-service-test.9kbfw2.c3.kafka.eu-west-1.amazonaws.com:9092,b-1.profile-service-test.9kbfw2.c3.kafka.eu-west-1.amazonaws.com:9092'
-
 # LocalStack API Key
 export LOCALSTACK_API_KEY=1fEPkBGBxu
-
-# Adding SnowSQL Alias
-alias snowsql=/Applications/SnowSQL.app/Contents/MacOS/snowsql
 
 # Load custom aliases
 source ~/dotfiles/home/.alias
@@ -156,28 +140,14 @@ source ~/dotfiles/home/.alias
 # Load PlantUML GraphViz
 export GRAPHVIZ_DOT=/opt/homebrew/Cellar/graphviz/13.1.2/bin/dot
 
-# AWS SSO Utils
+# AWS
 export AWS_DEFAULT_REGION=eu-west-1
-export AWS_DEFAULT_SSO_START_URL=https://d-93677093a7.awsapps.com/start
-export AWS_DEFAULT_SSO_REGION=eu-west-1
 
 #PROFILE SERVICES specific variables
 export PATH="$(brew --prefix)/opt/findutils/libexec/gnubin":$PATH
 export C_INCLUDE_PATH=/opt/homebrew/Cellar/snappy/1.1.9/include:/opt/homebrew/Cellar/librdkafka/1.9.2/include:/opt/homebrew/Cellar/libpng/1.6.39/include
 export LIBRARY_PATH=/opt/homebrew/Cellar/snappy/1.1.9/lib:/opt/homebrew/Cellar/librdkafka/1.9.2/lib:/opt/homebrew/Cellar/libpng/1.6.39/lib
-export ARTIFACTORY_USER=`cat ~/.netrc | grep login | sed -e 's/login[[:blank:]]*//'`
-export ARTIFACTORY_USERNAME=`cat ~/.netrc | grep login | sed -e 's/login[[:blank:]]*//'` # Required for CDS
-export ARTIFACTORY_PASSWORD=`cat ~/.netrc | grep password | sed -e 's/password[[:blank:]]*//'`
-
-# Tere Settings
-tere() {
-    local result=$(command tere "$@")
-    [ -n "$result" ] && cd -- "$result"
-}
 
 #THIS MUST BE AT THE END OF THE FILE FOR SDKMAN TO WORK!!!
 export SDKMAN_DIR="$HOME/.sdkman"
 [[ -s "$HOME/.sdkman/bin/sdkman-init.sh" ]] && source "$HOME/.sdkman/bin/sdkman-init.sh"
-# START: Added by Updated Airflow Breeze autocomplete setup
-source /Users/adas/codebase/personal/contrib/airflow/dev/breeze/autocomplete/breeze-complete-zsh.sh
-# END: Added by Updated Airflow Breeze autocomplete setup

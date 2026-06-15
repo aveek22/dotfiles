@@ -57,20 +57,13 @@ alias ta="terraform apply"
 alias taa="terraform apply -auto-approve"
 
 # AWS SSO
-alias awslogin="aws-sso-util login"
-alias awsconsole="aws-sso-util console launch -a 058264079373 -r dpg-administrator-cf"
-alias aws-data="awslogin && export AWS_PROFILE=dpg-data"
+alias awslogin="aws sso login --sso-session dpg-onelogin-sso"
 alias aws-rsprod="awslogin && export AWS_PROFILE=rs-prod"
 alias aws-rstest="awslogin && export AWS_PROFILE=rs-test"
 alias at="aws-rstest"
 alias ap="aws-rsprod"
-alias aet="aws-rstest && aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 975050087796.dkr.ecr.eu-west-1.amazonaws.com"
-alias aep="aws-rsprod && aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 058264079373.dkr.ecr.eu-west-1.amazonaws.com"
-
-# AWS Profiles
-alias aws-d92="export AWS_DEFAULT_PROFILE=aveek-d92 && export AWS_PROFILE=aveek-d92"
-alias awshome="cd ~/.aws && git restore . && git switch home && cd -"
-alias awswork="cd ~/.aws && git switch work && cd - && awslogin && export AWS_DEFAULT_PROFILE=data && echo 'Setting default profile to data.'"
+alias aet="export AWS_PROFILE=rs-test && aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 975050087796.dkr.ecr.eu-west-1.amazonaws.com"
+alias aep="export AWS_PROFILE=rs-prod && aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 058264079373.dkr.ecr.eu-west-1.amazonaws.com"
 
 # Misc
 alias speedtest="curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python -"
@@ -86,10 +79,9 @@ alias cnv="conveyor"
 alias cnvupd="conveyor update"
 
 # Profilers
-alias psps="cd ~/codebase/work/github/profile-service"
-alias cds="cd ~/codebase/work/github/content-data-service"
-alias idmapper="cd ~/codebase/work/github/profile-service/profile-service/id-mapper"
-alias cifailed="ap && python /Users/adas/codebase/work/github/profile-service/platform/scripts/retry-codestar-connection-failures/retry-failed-pipelines.py --pipeline-postfix=-release"
+alias psps="cd ~/codebase/work/profilers/profile-service"
+alias idmapper="cd ~/codebase/work/profilers/profile-service/profile-service/id-mapper"
+alias cifailed="ap && python /Users/adas/codebase/work/profilers/profile-service/platform/scripts/retry-codestar-connection-failures/retry-failed-pipelines.py --pipeline-postfix=-release"
 
 # Kubernetes
 alias k="kubectl"
