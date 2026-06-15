@@ -58,6 +58,7 @@ alias taa="terraform apply -auto-approve"
 
 # AWS SSO
 alias awslogin="aws sso login --sso-session dpg-onelogin-sso"
+alias aws-data="awslogin && export AWS_PROFILE=data"
 alias aws-rsprod="awslogin && export AWS_PROFILE=rs-prod"
 alias aws-rstest="awslogin && export AWS_PROFILE=rs-test"
 alias at="aws-rstest"
