@@ -74,6 +74,9 @@ alias cc=clear
 alias cs=clear
 alias dotfiles="cd ~/dotfiles && code ."
 alias pwdc="pwd | pbcopy"
+alias ll="eza -l --git --icons"
+alias lla="eza -la --git --icons"
+alias tree="eza -l --git --icons --tree"
 
 # Conveyor
 alias cnv="conveyor"
