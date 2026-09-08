@@ -179,8 +179,12 @@ stage_fake_repo_dir() {
     local real_repo_dir="$1"
     local staged="$TMP_TEST_DIR/repo"
     mkdir -p "$staged"
-    cp "$real_repo_dir/export" "$real_repo_dir/apply" "$real_repo_dir/lib.sh" "$staged/"
-    chmod +x "$staged/export" "$staged/apply"
+    for f in export apply lib.sh; do
+        if [ -f "$real_repo_dir/$f" ]; then
+            cp "$real_repo_dir/$f" "$staged/"
+            chmod +x "$staged/$f" 2>/dev/null || true
+        fi
+    done
     export FAKE_REPO_DIR="$staged"
 }
 ```
@@ -442,13 +446,15 @@ to_remove="$(comm -13 <(echo "$desired") <(echo "$current") || true)"
 if [ -n "$to_install" ]; then
     echo "vscode-apply: installing:"
     echo "$to_install" | sed 's/^/  + /'
-    echo "$to_install" | xargs -I{} code --install-extension {}
+    echo "$to_install" | xargs -I{} code --install-extension {} || true
 fi
 
 if [ -n "$to_remove" ]; then
     echo "vscode-apply: pruning (not in extensions.txt):"
     echo "$to_remove" | sed 's/^/  - /'
-    echo "$to_remove" | xargs -I{} code --uninstall-extension {}
+    # tolerate "already not installed" — uninstall is idempotent by design,
+    # so one already-gone extension shouldn't abort the whole reconciliation
+    echo "$to_remove" | xargs -I{} code --uninstall-extension {} || true
 fi
 
 echo "vscode-apply: done."
