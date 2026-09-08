@@ -183,6 +183,35 @@ ide/
   opaque per-machine profile folder. Collapsing to one profile removes it
   entirely.
 
+## Day-2 workflow (adding/removing extensions, themes, settings)
+
+**Setting change / theme change / keybinding change:** no export step needed
+— `settings.json`/`keybindings.json`/`snippets/` are live symlinks, so
+changing them in VS Code (Settings UI, JSON edit, or picking a theme via the
+Command Palette) writes straight through to the repo file. Just
+`git diff ide/vscode/settings.json`, commit, and `git pull` on other
+machines picks it up (VS Code may want a reload for some settings — normal
+VS Code behavior, unrelated to this setup).
+
+**Adding an extension (including a new theme extension):**
+1. Install normally (`Cmd+Shift+X` or `code --install-extension <id>`).
+2. Run `ide/vscode/export` — reruns `code --list-extensions` and rewrites
+   `extensions.txt`. This is the only file that needs an explicit export
+   step, since a package list can't be a live symlink the way a settings
+   file can.
+3. `git diff ide/vscode/extensions.txt`, commit.
+4. Other machines: `git pull`, then `ide/vscode/apply`.
+
+**Removing an extension:** uninstall locally, run `export` to drop it from
+`extensions.txt`, commit. `apply` on other machines is **additive + prune**:
+it installs everything listed in `extensions.txt` *and* uninstalls anything
+currently installed that isn't in the list, so a removal actually converges
+across machines on the next `apply` rather than lingering until manually
+uninstalled everywhere. Trade-off accepted: any one-off extension installed
+locally without adding it to `extensions.txt` gets removed the next time
+`apply` runs there — `apply` prints exactly what it's about to prune before
+doing so, so this is never silent.
+
 ## Non-goals / explicitly deferred
 
 - **Golang extensions/tooling** — user will add `golang.go` (and anything
