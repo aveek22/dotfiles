@@ -8,11 +8,16 @@ curated, what was cleaned up).
 ## First-time setup on a new machine
 
 ```bash
-./export   # only does anything if settings.json/keybindings.json aren't
-            # already committed here — on a freshly cloned repo they will be
-./apply    # symlinks settings/keybindings/snippets into place, installs
-            # every extension in extensions.txt, uninstalls anything else
+make export   # only does anything if settings.json/keybindings.json aren't
+                # already committed here — on a freshly cloned repo they will be
+make apply    # symlinks settings/keybindings/snippets into place, installs
+                # every extension in extensions.txt, uninstalls anything else
 ```
+
+`make` alone (no target) prints the available commands: `apply`, `export`,
+`prune` (alias for `apply` — pruning is bundled into it, not a separate
+step), `test`. Plain `./export`/`./apply` still work directly if you'd
+rather skip `make`.
 
 ## Day-to-day
 
@@ -20,15 +25,15 @@ curated, what was cleaned up).
   normal — `settings.json`/`keybindings.json`/`snippets/` are live symlinks
   into this directory, so the change already landed here. `git diff`,
   commit.
-- **Add an extension:** install it, then run `./export` to refresh
+- **Add an extension:** install it, then run `make export` to refresh
   `extensions.txt`, then commit. Other machines pick it up via
-  `git pull && ./apply`.
-- **Remove an extension:** uninstall it, `./export`, commit. `apply` is
-  **additive + prune** — on every machine it runs on, it installs
-  everything in `extensions.txt` *and* uninstalls anything installed that
-  isn't listed, printing both lists before acting. A one-off extension
-  installed locally without adding it to `extensions.txt` will get removed
-  the next time `apply` runs there.
+  `git pull && make apply`.
+- **Remove an extension:** uninstall it, `make export`, commit. `apply`
+  (and `prune`, its alias) is **additive + prune** — on every machine it
+  runs on, it installs everything in `extensions.txt` *and* uninstalls
+  anything installed that isn't listed, printing both lists before acting.
+  A one-off extension installed locally without adding it to
+  `extensions.txt` will get removed the next time `apply` runs there.
 
 ## Known machine-specific settings
 
