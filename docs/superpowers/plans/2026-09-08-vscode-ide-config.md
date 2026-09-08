@@ -948,7 +948,18 @@ always regenerates `extensions.txt` from the live install, this run
 temporarily overwrites Task 5's curated 71-line file with the live
 59-line one — expected, and fixed by `apply` in Step 3 below.
 
-- [ ] **Step 2: Restore the curated extensions.txt**
+- [ ] **Step 2: Save the pre-apply extension list before discarding it**
+
+```bash
+cp ~/dotfiles/ide/vscode/extensions.txt /tmp/vscode-extensions-before-apply.txt
+wc -l /tmp/vscode-extensions-before-apply.txt   # sanity check: ~59 lines
+```
+
+This is the rollback anchor for the extensions side of Step 3 — see
+**Rollback**, below. Once this exists, it's safe to discard the working
+copy.
+
+- [ ] **Step 3: Restore the curated extensions.txt**
 
 ```bash
 cd ~/dotfiles && git checkout ide/vscode/extensions.txt
@@ -958,7 +969,7 @@ cd ~/dotfiles && git checkout ide/vscode/extensions.txt
 something by hand; it isn't the right tool for a one-time bulk migration
 onto a curated list. `apply`, next, is.)
 
-- [ ] **Step 3: Run `apply`**
+- [ ] **Step 4: Run `apply`**
 
 ```bash
 cd ~/dotfiles/ide/vscode && ./apply
@@ -986,7 +997,7 @@ listing the 11 removed ones present in the live Default profile
 `hyperdarker.intellij-neo-dark`, `mskelton.one-dark-theme`,
 `nicohlr.pycharm`, `teabyii.ayu`, `zhuangtongfa.material-theme`).
 
-- [ ] **Step 4: Verify the real machine now matches the repo**
+- [ ] **Step 5: Verify the real machine now matches the repo**
 
 ```bash
 readlink "$HOME/Library/Application Support/Code/User/settings.json"
@@ -999,10 +1010,48 @@ diff <(code --list-extensions | LC_ALL=C sort) <(LC_ALL=C sort ~/dotfiles/ide/vs
 # expect: no output (exact match)
 ```
 
-- [ ] **Step 5: Restart VS Code** so the new symlinked settings/keybindings take effect, and spot-check that Catppuccin Mocha + material-icon-theme still render correctly.
+- [ ] **Step 6: Restart VS Code** so the new symlinked settings/keybindings take effect, and spot-check that Catppuccin Mocha + material-icon-theme still render correctly.
 
-- [ ] **Step 6: Commit** (only if `apply` or the checks above surfaced anything worth recording — e.g. if you note the backup file paths for your own reference)
+- [ ] **Step 7: Commit** (only if `apply` or the checks above surfaced anything worth recording — e.g. if you note the backup file paths for your own reference)
 
 ```bash
 git add -A && git commit -m "Apply unified vscode config on work Mac" --allow-empty
 ```
+
+#### Rollback
+
+Two independent layers — reverting the git branch does **not** undo either
+of these; they're real machine side effects, not repo state.
+
+**Settings/keybindings/snippets** — `apply`'s `link()` already backed up
+whatever was live before symlinking, to `<path>.bak-<timestamp>` (the exact
+names were printed by Step 4 and are visible via `ls "$HOME/Library/Application Support/Code/User/"*.bak-*`).
+To undo one:
+
+```bash
+user_dir="$HOME/Library/Application Support/Code/User"
+rm "$user_dir/settings.json"     # removes the symlink
+mv "$user_dir/settings.json.bak-<timestamp>" "$user_dir/settings.json"
+# repeat for keybindings.json and snippets/, using their own .bak-<timestamp> names
+```
+
+**Extensions** — reuse `apply` itself rather than writing new rollback
+logic: point it at the pre-apply snapshot saved in Step 2, let it reconcile
+back, then restore the curated list.
+
+```bash
+cd ~/dotfiles/ide/vscode
+cp extensions.txt /tmp/vscode-extensions-curated.txt        # save the curated list
+cp /tmp/vscode-extensions-before-apply.txt extensions.txt   # swap in the pre-apply snapshot
+./apply                                                       # installs back what was pruned, removes what was added
+cp /tmp/vscode-extensions-curated.txt extensions.txt        # restore the curated list in the repo
+git checkout extensions.txt 2>/dev/null || true              # or just re-checkout if nothing else changed it
+```
+
+**If `apply` itself dies mid-run** (network drop, a `code --install-extension`
+failure) rather than a deliberate rollback: nothing needs manual repair.
+`apply` runs symlinks first, then installs, then prunes — a failure during
+install stops the script before prune ever starts, so nothing scheduled for
+removal is touched yet. Since `apply` is idempotent, just re-run
+`./apply` once the underlying problem (network, `code` CLI) is fixed; it
+picks up exactly where it left off.
