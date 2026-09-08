@@ -24,6 +24,7 @@ Install Homebrew packages: `brew bundle --file=brew/Brewfile`
 | `home/.zshrc`      | Zsh config — oh-my-zsh (agnoster theme), PATH exports, tool initialisation (pyenv, sdkman, poetry) |
 | `home/.alias`      | All shell aliases (sourced by `.zshrc`)                                                            |
 | `home/.ssh/config` | SSH host aliases for work GitHub, personal GitHub, and Bitbucket                                   |
+| `ide/vscode/`      | VS Code settings/keybindings/snippets (live symlinks) + extensions.txt (installed via `ide/vscode/apply`) |
 | `brew/Brewfile`    | Homebrew formulae and casks                                                                        |
 | `scripts/kube`     | Interactive script to update kubeconfig and open k9s for one of the three EKS clusters             |
 | `itermcolors/`     | iTerm2 colour scheme `.itermcolors` files — import manually via iTerm2 preferences                 |
