@@ -1,0 +1,137 @@
+{
+  "update.mode": "none",
+  "editor.tokenColorCustomizations": {
+    "textMateRules": [
+      {
+        "name": "One Dark italic",
+        "scope": [
+          "comment",
+          "entity.other.attribute-name",
+          "keyword",
+          "markup.underline.link",
+          "storage.modifier",
+          "storage.type",
+          "string.url",
+          "variable.language.super",
+          "variable.language.this"
+        ],
+        "settings": {
+          "fontStyle": "italic"
+        }
+      },
+      {
+        "name": "One Dark italic reset",
+        "scope": [
+          "keyword.operator",
+          "keyword.other.type",
+          "storage.modifier.import",
+          "storage.modifier.package",
+          "storage.type.built-in",
+          "storage.type.function.arrow",
+          "storage.type.generic",
+          "storage.type.java",
+          "storage.type.primitive"
+        ],
+        "settings": {
+          "fontStyle": ""
+        }
+      }
+    ]
+  },
+  "redhat.telemetry.enabled": false,
+  "editor.mouseWheelZoom": true,
+  "terminal.integrated.fontSize": 14,
+  "editor.fontSize": 14,
+  "workbench.tree.indent": 20,
+  "editor.fontFamily": "'JetBrains Mono', Menlo, Monaco, 'Courier New', monospace",
+  "git.confirmSync": false,
+  "files.exclude": {
+    ".pytest*": true,
+    ".vscode": true,
+    "**/__pycache__": true,
+    "**/.bloop": true,
+    "**/.bsp": true,
+    "**/.idea": true,
+    "**/.metals": true,
+    "**/.pytest_cache": true,
+    "**/.vscode": true,
+    "*pycache*": true
+  },
+  "files.autoSave": "afterDelay",
+  "git.openRepositoryInParentFolders": "always",
+  "files.watcherExclude": {
+    "**/.ammonite": true,
+    "**/.bloop/**": true,
+    "**/.metals/**/*.{java,scala}": true
+  },
+  "git.autofetch": true,
+  "editor.defaultFormatter": "vscode.json-language-features",
+  "plantuml.render": "Local",
+  "[markdown]": {
+    "editor.defaultFormatter": "yzhang.markdown-all-in-one"
+  },
+  "[plantuml]": {
+    "editor.defaultFormatter": "jebbs.plantuml"
+  },
+  "gitlens.codeLens.enabled": false,
+  "[scala]": {
+    "editor.defaultFormatter": "scalameta.metals"
+  },
+  "files.associations": {
+    "*.Makefile": "makefile",
+    "*.json5": "jsonc"
+  },
+  "explorer.confirmDragAndDrop": false,
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter"
+  },
+  "diffEditor.ignoreTrimWhitespace": false,
+  "editor.fontWeight": "400",
+  "[terraform]": {
+    "editor.defaultFormatter": "hashicorp.terraform"
+  },
+  "[yaml]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "database-client.autoSync": true,
+  "aws.cloudformation.telemetry.enabled": false,
+  "chat.instructionsFilesLocations": {
+    ".github/instructions": true,
+    ".claude/rules": true,
+    "~/.copilot/instructions": true,
+    "~/.claude/rules": true
+  },
+  "git.enableSmartCommit": true,
+  "gitlens.currentLine.fontSize": 12,
+  "gitblame.delayBlame": 50,
+  "gitblame.inlineMessageEnabled": true,
+  "workbench.iconTheme": "material-icon-theme",
+  "[github-actions-workflow]": {
+    "editor.defaultFormatter": "redhat.vscode-yaml"
+  },
+  "todo-tree.ripgrep.ripgrep": "/opt/homebrew/bin/rg",
+  "makefile.configureOnOpen": false,
+  "snyk.advanced.cliPath": "/Users/adas/Library/Application Support/snyk/vscode-cli/snyk-macos-arm64",
+  "snyk.yesWelcomeNotification": false,
+  "chat.viewSessions.orientation": "stacked",
+  "json.schemaDownload.trustedDomains": {
+    "https://developer.microsoft.com/json-schemas/": true,
+    "https://docs.renovatebot.com/renovate-schema.json": true,
+    "https://json-schema.org/": true,
+    "https://json.schemastore.org/": true,
+    "https://raw.githubusercontent.com/devcontainers/spec/": true,
+    "https://raw.githubusercontent.com/microsoft/vscode/": true,
+    "https://schemastore.azurewebsites.net/": true,
+    "https://www.schemastore.org/": true
+  },
+  "yaml.disableSchemaDetection": [
+    "**/.github/workflows/*.yml",
+    "**/.github/workflows/*.yaml",
+    "**/.gitea/workflows/*.yml",
+    "**/.gitea/workflows/*.yaml",
+    "**/.forgejo/workflows/*.yml",
+    "**/.forgejo/workflows/*.yaml"
+  ],
+  "workbench.colorTheme": "Catppuccin Mocha",
+  "evenBetterToml.formatter.indentEntries": true
+}
