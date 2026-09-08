@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+# Symlinks settings/keybindings/snippets into VS Code's User directory
+# (backing up any pre-existing real file first) and reconciles installed
+# extensions with extensions.txt: additive (installs what's missing) +
+# prune (uninstalls what's installed but not listed).
+set -euo pipefail
+
+repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$repo_dir/lib.sh"
+
+if ! command -v code >/dev/null 2>&1; then
+    echo "vscode-apply: 'code' CLI not found in PATH" >&2
+    echo "  Run 'Shell Command: Install code command in PATH' from VS Code's Command Palette." >&2
+    exit 1
+fi
+
+user_dir="$(vscode_user_dir)"
+mkdir -p "$user_dir"
+
+link() {
+    local repo_path="$1" live_path="$2"
+    if [ ! -e "$repo_path" ]; then
+        echo "vscode-apply: $repo_path does not exist, skipping" >&2
+        return 1
+    fi
+    if [ -L "$live_path" ] && [ "$(readlink "$live_path")" = "$repo_path" ]; then
+        return 0  # already correct, nothing to do
+    fi
+    if [ -e "$live_path" ]; then
+        local backup="${live_path}.bak-$(date +%Y%m%d%H%M%S)"
+        mv "$live_path" "$backup"
+        echo "vscode-apply: backed up existing $live_path -> $backup"
+    fi
+    ln -s "$repo_path" "$live_path"
+    echo "vscode-apply: linked $live_path -> $repo_path"
+}
+
+link "$repo_dir/settings.json" "$user_dir/settings.json"
+link "$repo_dir/keybindings.json" "$user_dir/keybindings.json"
+mkdir -p "$repo_dir/snippets"
+link "$repo_dir/snippets" "$user_dir/snippets"
+
+# --- extensions: additive + prune ---
+desired="$(LC_ALL=C sort "$repo_dir/extensions.txt")"
+current="$(code --list-extensions | LC_ALL=C sort)"
+
+to_install="$(comm -23 <(echo "$desired") <(echo "$current") || true)"
+to_remove="$(comm -13 <(echo "$desired") <(echo "$current") || true)"
+
+if [ -n "$to_install" ]; then
+    echo "vscode-apply: installing:"
+    echo "$to_install" | sed 's/^/  + /'
+    echo "$to_install" | xargs -I{} code --install-extension {}
+fi
+
+if [ -n "$to_remove" ]; then
+    echo "vscode-apply: pruning (not in extensions.txt):"
+    echo "$to_remove" | sed 's/^/  - /'
+    echo "$to_remove" | xargs -I{} code --uninstall-extension {}
+fi
+
+echo "vscode-apply: done."
