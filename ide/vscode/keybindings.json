@@ -1,21 +1,21 @@
 [
   {
-    "key": "ctrl+shift+,",
+    "key": "ctrl+alt+left",
     "command": "workbench.action.decreaseViewSize",
     "when": "sideBarFocus"
   },
   {
-    "key": "ctrl+shift+.",
+    "key": "ctrl+alt+right",
     "command": "workbench.action.increaseViewSize",
     "when": "sideBarFocus"
   },
   {
-    "key": "ctrl+shift+,",
+    "key": "ctrl+alt+down",
     "command": "workbench.action.decreaseViewSize",
     "when": "terminalFocus"
   },
   {
-    "key": "ctrl+shift+.",
+    "key": "ctrl+alt+up",
     "command": "workbench.action.increaseViewSize",
     "when": "terminalFocus"
   },
