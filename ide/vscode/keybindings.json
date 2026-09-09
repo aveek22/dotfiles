@@ -18,5 +18,20 @@
     "key": "ctrl+shift+.",
     "command": "workbench.action.increaseViewSize",
     "when": "terminalFocus"
+  },
+  {
+    "key": "cmd+shift+b",
+    "command": "metals.compile-cascade",
+    "when": "editorTextFocus && editorLangId == 'scala'"
+  },
+  {
+    "key": "cmd+shift+t",
+    "command": "metals.test-current-target",
+    "when": "editorTextFocus && editorLangId == 'scala'"
+  },
+  {
+    "key": "cmd+shift+r",
+    "command": "metals.run-current-file",
+    "when": "editorTextFocus && editorLangId == 'scala'"
   }
 ]
