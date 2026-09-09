@@ -5,13 +5,16 @@
 # to sync (see docs/superpowers/specs/2026-09-09-idea-ide-config-design.md
 # for the excluded-file rationale). Single source of truth for both export
 # (bootstrap) and apply (symlink) — add to this list, never hardcode a
-# second copy elsewhere.
+# second copy elsewhere. Entries are paths relative to options/ and may
+# include a subdirectory (e.g. mac/keymap.xml) — apply/export create the
+# parent directory on both sides as needed.
 IDEA_OPTION_FILES=(
     colors.scheme.xml console-font.xml editor-font.xml terminal-font.xml
     ui.lnf.xml find.xml findUsages.xml diff.xml debugger.xml
     filetypes.xml overrideFileTypes.xml csvSettings.xml git_toolbox_blame.xml
     javaRuleManager.xml scala.xml scala_config.xml spellchecker-dictionary.xml
     textmate.xml advancedSettings.xml avro_idl.xml
+    mac/keymap.xml
 )
 
 # The whole-directory areas where everything inside is inherently a

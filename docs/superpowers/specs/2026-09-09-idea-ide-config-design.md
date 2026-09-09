@@ -248,3 +248,32 @@ the future?** Two different answers depending on which:
 - Plugins: no dotfiles workflow at all beyond an unconditionally
   regenerated `plugins.txt` reference snapshot — installation stays fully
   manual, by design.
+
+## Addendum (2026-09-09): active-keymap pointer lives in a subdirectory
+
+First real use of the "add a new tracked settings file" workflow (setting
+a custom `Ctrl+~` terminal-toggle shortcut) surfaced a gap this design
+didn't anticipate: *which* keymap is active isn't recorded directly under
+`options/`, but under a platform-specific subdirectory,
+`options/mac/keymap.xml` — a one-line pointer
+(`<active_keymap name="..."/>`), directly analogous to `colors.scheme.xml`
+in every way that mattered for the original allowlist criteria (pure
+preference, no absolute paths, no account identity). Two adjacent files
+checked at the same time and confirmed **not** worth tracking:
+`keymapFlags.xml` (bookkeeping for which keymap-related UI notices have
+already been shown) and `other.xml` (a large generic bucket mixing dozens
+of unrelated UI-state values — search-history strings, splitter
+proportions — alongside one incidental `"KEYMAP": "terminal"` entry that
+was just the Keymap settings dialog's last search query, not an
+active-keymap pointer).
+
+`IDEA_OPTION_FILES` entries were generalized to allow a subdirectory
+component (`mac/keymap.xml`), and `apply`/`export` were fixed to create
+the parent directory on whichever side needs it — `export`'s `cp` failed
+outright on a repo that had never bootstrapped that subdirectory before
+(caught by a new test asserting bootstrap into a not-yet-existing
+`options/mac/`); `apply` was fixed defensively for the mirror case (a
+fresh machine where the live `options/mac/` has also never been created),
+even though the real machine here already had it. Both fixes are
+backward-compatible — a flat filename's `dirname` is `.`, so the added
+`mkdir -p` is a no-op for every existing entry.

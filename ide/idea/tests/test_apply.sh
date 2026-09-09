@@ -10,15 +10,17 @@ stage_fake_repo_dir "$real_repo_dir"
 
 # minimal repo content to apply: one whole-dir with content, one curated
 # options file
-mkdir -p "$FAKE_REPO_DIR/keymaps" "$FAKE_REPO_DIR/colors" "$FAKE_REPO_DIR/templates" "$FAKE_REPO_DIR/fileTemplates" "$FAKE_REPO_DIR/codestyles" "$FAKE_REPO_DIR/options"
+mkdir -p "$FAKE_REPO_DIR/keymaps" "$FAKE_REPO_DIR/colors" "$FAKE_REPO_DIR/templates" "$FAKE_REPO_DIR/fileTemplates" "$FAKE_REPO_DIR/codestyles" "$FAKE_REPO_DIR/options/mac"
 echo '<keymap name="Mine" />' > "$FAKE_REPO_DIR/keymaps/Mine.xml"
 echo '<application><component name="Test" /></application>' > "$FAKE_REPO_DIR/options/find.xml"
+echo '<application><component name="KeymapManager"><active_keymap name="Mine" /></component></application>' > "$FAKE_REPO_DIR/options/mac/keymap.xml"
 
-# pre-existing real (non-symlinked) keymaps/ dir and find.xml — must be
-# backed up, not destroyed
-mkdir -p "$FAKE_CONFIG_DIR/keymaps"
+# pre-existing real (non-symlinked) keymaps/ dir, find.xml, and nested
+# options/mac/keymap.xml — must be backed up, not destroyed
+mkdir -p "$FAKE_CONFIG_DIR/keymaps" "$FAKE_CONFIG_DIR/options/mac"
 echo '<keymap name="Old" />' > "$FAKE_CONFIG_DIR/keymaps/Old.xml"
 echo '<application><component name="Old" /></application>' > "$FAKE_CONFIG_DIR/options/find.xml"
+echo '<application><component name="KeymapManager"><active_keymap name="Old" /></component></application>' > "$FAKE_CONFIG_DIR/options/mac/keymap.xml"
 
 "$FAKE_REPO_DIR/apply"
 
@@ -56,6 +58,20 @@ for name in colors templates fileTemplates codestyles; do
     fi
 done
 
+# 5b. a nested options entry (mac/keymap.xml) is symlinked correctly —
+# both the live and repo side parent dirs get created as needed
+if [ "$(readlink "$FAKE_CONFIG_DIR/options/mac/keymap.xml")" != "$FAKE_REPO_DIR/options/mac/keymap.xml" ]; then
+    echo "FAIL: nested options/mac/keymap.xml was not symlinked to the repo copy"
+    exit 1
+fi
+
+# 5c. the pre-existing real nested options/mac/keymap.xml was backed up too
+backup_nested="$(find "$FAKE_CONFIG_DIR/options/mac" -maxdepth 1 -name 'keymap.xml.bak-*' | head -1)"
+if [ -z "$backup_nested" ] || ! grep -q 'name="Old"' "$backup_nested"; then
+    echo "FAIL: pre-existing nested options/mac/keymap.xml was not backed up before symlinking"
+    exit 1
+fi
+
 # 6. running apply again is a no-op (doesn't re-backup an already-correct symlink)
 before_backups="$(find "$FAKE_CONFIG_DIR" -maxdepth 1 -name 'keymaps.bak-*' | wc -l | tr -d ' ')"
 "$FAKE_REPO_DIR/apply"
@@ -71,14 +87,25 @@ fi
 teardown_fake_idea_env
 setup_fake_idea_env
 stage_fake_repo_dir "$real_repo_dir"
-mkdir -p "$FAKE_REPO_DIR/keymaps" "$FAKE_REPO_DIR/colors" "$FAKE_REPO_DIR/templates" "$FAKE_REPO_DIR/fileTemplates" "$FAKE_REPO_DIR/codestyles" "$FAKE_REPO_DIR/options"
+mkdir -p "$FAKE_REPO_DIR/keymaps" "$FAKE_REPO_DIR/colors" "$FAKE_REPO_DIR/templates" "$FAKE_REPO_DIR/fileTemplates" "$FAKE_REPO_DIR/codestyles" "$FAKE_REPO_DIR/options/mac"
 echo '<application><component name="Test" /></application>' > "$FAKE_REPO_DIR/options/find.xml"
-# deliberately no debugger.xml in the fake repo dir
+echo '<application><component name="KeymapManager"><active_keymap name="Mine" /></component></application>' > "$FAKE_REPO_DIR/options/mac/keymap.xml"
+# deliberately no debugger.xml in the fake repo dir, and (simulating a
+# fresh machine that's never customized its keymap) no pre-existing
+# options/mac/ live directory either — apply must create it
 
 "$FAKE_REPO_DIR/apply"
 
 if [ "$(readlink "$FAKE_CONFIG_DIR/options/find.xml")" != "$FAKE_REPO_DIR/options/find.xml" ]; then
     echo "FAIL: a missing debugger.xml aborted the run before find.xml was linked"
+    exit 1
+fi
+
+# 7b. nested options/mac/keymap.xml links correctly even when the live
+# options/mac/ directory never existed before (fresh machine, keymap never
+# customized there) — apply must create the parent dir on the live side
+if [ "$(readlink "$FAKE_CONFIG_DIR/options/mac/keymap.xml")" != "$FAKE_REPO_DIR/options/mac/keymap.xml" ]; then
+    echo "FAIL: nested options/mac/keymap.xml was not linked when the live parent dir didn't pre-exist"
     exit 1
 fi
 

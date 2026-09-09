@@ -32,7 +32,17 @@ make apply    # symlinks keymaps/colors/templates/fileTemplates/codestyles
   machine-specific paths, account identity, or secrets (see the excluded
   list below for what to watch for), add its filename to
   `IDEA_OPTION_FILES` in `lib.sh`, run `make export` to bootstrap it in,
-  commit. Other machines pick it up via `git pull && make apply`.
+  commit. Other machines pick it up via `git pull && make apply`. Entries
+  may include a subdirectory (e.g. `mac/keymap.xml` — see below) — `apply`
+  and `export` create the parent directory on both sides as needed.
+- **Setting a keyboard shortcut (e.g. terminal toggle):** IntelliJ has no
+  headless way to do this — set it via Settings → Keymap as normal. If
+  you're still on a default (read-only) keymap, IntelliJ prompts you to
+  name a copy; that new keymap file lands directly in `keymaps/` (already
+  live, no export needed). *Which* keymap is active is recorded separately
+  in `options/mac/keymap.xml` — tracked in `IDEA_OPTION_FILES` for exactly
+  this reason, so the active-keymap choice syncs along with the shortcut
+  itself.
 - **Plugins:** manage installation yourself via the Marketplace UI.
   `make export` refreshes `plugins.txt` as a reference snapshot of
   installed plugin folder names — `apply` never installs, uninstalls, or
@@ -54,7 +64,11 @@ make apply    # symlinks keymaps/colors/templates/fileTemplates/codestyles
 - **Pure machine state/telemetry/cache:** everything else under `options/`
   not listed in `IDEA_OPTION_FILES` — recent projects, window
   geometry/layout, usage statistics, trusted paths, feedback/onboarding
-  state, caches, and similar.
+  state, caches, and similar. This includes `keymapFlags.xml` (which
+  keymap-related notices have already been shown to you — UI bookkeeping,
+  not a preference) and `other.xml` (a generic bucket mixing dozens of
+  unrelated UI-state values, e.g. search-history strings and splitter
+  proportions — too noisy to track wholesale).
 
 ## Known machine-specific settings
 

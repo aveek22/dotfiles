@@ -35,9 +35,11 @@ for name in "${IDEA_WHOLE_DIRS[@]}"; do
     link "$repo_dir/$name" "$config_dir/$name" || true
 done
 
-# --- curated options/*.xml files ---
+# --- curated options/*.xml files (entries may nest, e.g. mac/keymap.xml —
+# create the parent dir on the live side before linking) ---
 mkdir -p "$config_dir/options"
 for name in "${IDEA_OPTION_FILES[@]}"; do
+    mkdir -p "$config_dir/options/$(dirname "$name")"
     link "$repo_dir/options/$name" "$config_dir/options/$name" || true
 done
 
