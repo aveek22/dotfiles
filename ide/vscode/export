@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Refreshes ide/vscode/extensions.txt from what's actually installed, and
-# bootstraps settings.json/keybindings.json/snippets/ into the repo the
-# first time (before `apply` has symlinked them). Safe to run repeatedly —
+# bootstraps settings.json/keybindings.json/tasks.json/snippets/ into the
+# repo the first time (before `apply` has symlinked them). Safe to run
+# repeatedly —
 # once a repo copy exists, it is never overwritten by this script again;
 # only `apply` (deliberately, via backup-then-symlink) changes that.
 set -euo pipefail
@@ -35,6 +36,7 @@ bootstrap_file() {
 
 bootstrap_file "$user_dir/settings.json" "$repo_dir/settings.json"
 bootstrap_file "$user_dir/keybindings.json" "$repo_dir/keybindings.json"
+bootstrap_file "$user_dir/tasks.json" "$repo_dir/tasks.json"
 
 if [ -d "$user_dir/snippets" ] && [ ! -L "$user_dir/snippets" ] && [ -z "$(ls -A "$repo_dir/snippets" 2>/dev/null)" ]; then
     mkdir -p "$repo_dir/snippets"

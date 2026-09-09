@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Symlinks settings/keybindings/snippets into VS Code's User directory
+# Symlinks settings/keybindings/tasks/snippets into VS Code's User directory
 # (backing up any pre-existing real file first) and reconciles installed
 # extensions with extensions.txt: additive (installs what's missing) +
 # prune (uninstalls what's installed but not listed).
@@ -35,10 +35,14 @@ link() {
     echo "vscode-apply: linked $live_path -> $repo_path"
 }
 
-link "$repo_dir/settings.json" "$user_dir/settings.json"
-link "$repo_dir/keybindings.json" "$user_dir/keybindings.json"
+# A missing individual repo file (link() logs and returns 1) must not abort
+# the whole run — the remaining links and extension reconciliation below
+# still need to happen.
+link "$repo_dir/settings.json" "$user_dir/settings.json" || true
+link "$repo_dir/keybindings.json" "$user_dir/keybindings.json" || true
+link "$repo_dir/tasks.json" "$user_dir/tasks.json" || true
 mkdir -p "$repo_dir/snippets"
-link "$repo_dir/snippets" "$user_dir/snippets"
+link "$repo_dir/snippets" "$user_dir/snippets" || true
 
 # --- extensions: additive + prune ---
 desired="$(LC_ALL=C sort "$repo_dir/extensions.txt")"

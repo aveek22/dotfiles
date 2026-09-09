@@ -11,6 +11,7 @@ stage_fake_repo_dir "$real_repo_dir"
 # minimal repo content to apply
 echo '{"theme": "test"}' > "$FAKE_REPO_DIR/settings.json"
 echo '[]' > "$FAKE_REPO_DIR/keybindings.json"
+echo '{"version": "2.0.0", "tasks": []}' > "$FAKE_REPO_DIR/tasks.json"
 mkdir -p "$FAKE_REPO_DIR/snippets"
 printf 'wanted.ext\n' > "$FAKE_REPO_DIR/extensions.txt"
 
@@ -45,6 +46,12 @@ if [ "$(readlink "$FAKE_USER_DIR/snippets")" != "$FAKE_REPO_DIR/snippets" ]; the
     exit 1
 fi
 
+# 3b. tasks.json symlinked too
+if [ "$(readlink "$FAKE_USER_DIR/tasks.json")" != "$FAKE_REPO_DIR/tasks.json" ]; then
+    echo "FAIL: tasks.json was not symlinked"
+    exit 1
+fi
+
 # 4. extensions reconciled: wanted.ext installed, b.ext pruned
 final="$(sort "$FAKE_EXTENSIONS_FILE")"
 if [ "$final" != "wanted.ext" ]; then
@@ -58,6 +65,31 @@ before_backups="$(find "$FAKE_USER_DIR" -maxdepth 1 -name 'settings.json.bak-*' 
 after_backups="$(find "$FAKE_USER_DIR" -maxdepth 1 -name 'settings.json.bak-*' | wc -l | tr -d ' ')"
 if [ "$before_backups" != "$after_backups" ]; then
     echo "FAIL: second apply run created an unnecessary backup of an already-correct symlink"
+    exit 1
+fi
+
+# 6. a missing individual repo file (e.g. tasks.json not committed yet) must
+# not abort the whole run — extension reconciliation still has to happen.
+# Uses a second fresh env so this doesn't interact with the state above.
+teardown_fake_vscode_env
+setup_fake_vscode_env
+stage_fake_repo_dir "$real_repo_dir"
+echo '{"theme": "test"}' > "$FAKE_REPO_DIR/settings.json"
+echo '[]' > "$FAKE_REPO_DIR/keybindings.json"
+# deliberately no tasks.json in the fake repo dir
+mkdir -p "$FAKE_REPO_DIR/snippets"
+printf 'wanted.ext\n' > "$FAKE_REPO_DIR/extensions.txt"
+printf 'b.ext\n' > "$FAKE_EXTENSIONS_FILE"
+
+"$FAKE_REPO_DIR/apply"
+
+final="$(sort "$FAKE_EXTENSIONS_FILE")"
+if [ "$final" != "wanted.ext" ]; then
+    echo "FAIL: a missing tasks.json aborted the run before extensions were reconciled (got: $final)"
+    exit 1
+fi
+if [ -e "$FAKE_USER_DIR/tasks.json" ]; then
+    echo "FAIL: tasks.json should not have been created when absent from the repo"
     exit 1
 fi
 
