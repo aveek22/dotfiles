@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "key": "ctrl+shift+,",
+    "command": "workbench.action.decreaseViewSize",
+    "when": "sideBarFocus"
+  },
+  {
+    "key": "ctrl+shift+.",
+    "command": "workbench.action.increaseViewSize",
+    "when": "sideBarFocus"
+  }
+]
