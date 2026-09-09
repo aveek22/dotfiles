@@ -1,0 +1,15 @@
+<application>
+  <component name="FileTypeManager" version="19">
+    <extensionMap>
+      <removed_mapping ext="doc" approved="true" type="Native" />
+      <removed_mapping ext="docx" approved="true" type="Native" />
+      <removed_mapping ext="jsonl" approved="true" type="JSON-lines" />
+      <removed_mapping ext="jsonlines" approved="true" type="JSON-lines" />
+      <removed_mapping ext="ndjson" approved="true" type="JSON-lines" />
+      <removed_mapping ext="pdf" approved="true" type="Native" />
+      <removed_mapping ext="ppt" approved="true" type="Native" />
+      <removed_mapping ext="pptx" approved="true" type="Native" />
+      <removed_mapping ext="zip" approved="true" type="ARCHIVE" />
+    </extensionMap>
+  </component>
+</application>

@@ -1,0 +1,11 @@
+Scala
+astro
+avro-schema-support
+github-actions-manager
+gittoolbox
+makefile
+terraform
+vcs-hg
+vcs-perforce
+vcs-svn
+vitejs
