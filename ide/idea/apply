@@ -1,0 +1,44 @@
+#!/usr/bin/env bash
+# Symlinks the whole-directory areas (keymaps/colors/templates/
+# fileTemplates/codestyles) and curated options/*.xml files into IntelliJ
+# IDEA's config directory (backing up any pre-existing real file/dir
+# first). No plugin handling — plugins are managed manually; see the
+# design spec.
+set -euo pipefail
+
+repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$repo_dir/lib.sh"
+
+config_dir="$(idea_config_dir)" || exit 1
+
+link() {
+    local repo_path="$1" live_path="$2"
+    if [ ! -e "$repo_path" ]; then
+        echo "idea-apply: $repo_path does not exist, skipping" >&2
+        return 1
+    fi
+    if [ -L "$live_path" ] && [ "$(readlink "$live_path")" = "$repo_path" ]; then
+        return 0  # already correct, nothing to do
+    fi
+    if [ -e "$live_path" ]; then
+        local backup="${live_path}.bak-$(date +%Y%m%d%H%M%S)"
+        mv "$live_path" "$backup"
+        echo "idea-apply: backed up existing $live_path -> $backup"
+    fi
+    ln -s "$repo_path" "$live_path"
+    echo "idea-apply: linked $live_path -> $repo_path"
+}
+
+# --- whole-directory areas ---
+for name in "${IDEA_WHOLE_DIRS[@]}"; do
+    mkdir -p "$repo_dir/$name"
+    link "$repo_dir/$name" "$config_dir/$name" || true
+done
+
+# --- curated options/*.xml files ---
+mkdir -p "$config_dir/options"
+for name in "${IDEA_OPTION_FILES[@]}"; do
+    link "$repo_dir/options/$name" "$config_dir/options/$name" || true
+done
+
+echo "idea-apply: done."
