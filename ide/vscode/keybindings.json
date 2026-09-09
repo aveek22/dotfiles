@@ -20,18 +20,54 @@
     "when": "terminalFocus"
   },
   {
-    "key": "cmd+shift+b",
+    "key": "ctrl+b",
     "command": "metals.compile-cascade",
     "when": "editorTextFocus && editorLangId == 'scala'"
   },
   {
-    "key": "cmd+shift+t",
+    "key": "ctrl+t",
     "command": "metals.test-current-target",
     "when": "editorTextFocus && editorLangId == 'scala'"
   },
   {
-    "key": "cmd+shift+r",
+    "key": "ctrl+r",
     "command": "metals.run-current-file",
     "when": "editorTextFocus && editorLangId == 'scala'"
+  },
+  {
+    "key": "cmd+shift+e",
+    "command": "workbench.view.explorer"
+  },
+  {
+    "key": "cmd+shift+g",
+    "command": "workbench.view.scm"
+  },
+  {
+    "key": "cmd+shift+f",
+    "command": "workbench.view.search"
+  },
+  {
+    "key": "cmd+shift+d",
+    "command": "workbench.view.debug"
+  },
+  {
+    "key": "cmd+shift+x",
+    "command": "workbench.view.extensions"
+  },
+  {
+    "key": "cmd+shift+t",
+    "command": "workbench.view.extension.test"
+  },
+  {
+    "key": "cmd+shift+c",
+    "command": "workbench.action.chat.open"
+  },
+  {
+    "key": "cmd+shift+z",
+    "command": "workbench.view.extension.todo-tree-container"
+  },
+  {
+    "key": "cmd+b",
+    "command": "workbench.action.toggleSidebarVisibility"
   }
 ]
