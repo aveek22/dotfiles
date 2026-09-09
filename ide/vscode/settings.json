@@ -111,8 +111,6 @@
   },
   "todo-tree.ripgrep.ripgrep": "/opt/homebrew/bin/rg",
   "makefile.configureOnOpen": false,
-  "snyk.advanced.cliPath": "/Users/adas/Library/Application Support/snyk/vscode-cli/snyk-macos-arm64",
-  "snyk.yesWelcomeNotification": false,
   "chat.viewSessions.orientation": "stacked",
   "json.schemaDownload.trustedDomains": {
     "https://developer.microsoft.com/json-schemas/": true,

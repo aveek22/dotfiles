@@ -37,14 +37,15 @@ rather skip `make`.
 
 ## Known machine-specific settings
 
-These two values are baked to this machine's paths and aren't portable —
 VS Code's `settings.json` has no variable substitution for arbitrary
-extension keys. Adjust them after `apply` on a different machine:
+extension keys, so a path baked to one machine won't resolve on another.
+Currently nothing tracked here has that problem — `snyk.advanced.cliPath`
+was removed (the Snyk extension isn't used) and `black-formatter.path` was
+removed (its old value was malformed and inert anyway). If you add a
+setting with an absolute machine-specific path later, note it here.
 
-- `snyk.advanced.cliPath`
-- `black-formatter.path` (removed for now — add it back with a valid value
-  if you want Black autoformatting; the malformed value that was here
-  before was inert)
+- `black-formatter.path` — add it back with a valid value if you want
+  Black autoformatting; it's not tracked here right now.
 
 ## Non-goals
 
