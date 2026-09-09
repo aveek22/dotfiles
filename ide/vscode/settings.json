@@ -41,6 +41,11 @@
   "redhat.telemetry.enabled": false,
   "editor.mouseWheelZoom": true,
   "terminal.integrated.fontSize": 14,
+  "terminal.integrated.commandsToSkipShell": [
+    "workbench.action.decreaseViewSize",
+    "workbench.action.increaseViewSize",
+    "runCommands"
+  ],
   "editor.fontSize": 14,
   "workbench.tree.indent": 20,
   "editor.fontFamily": "'JetBrainsMono Nerd Font', 'JetBrains Mono', Menlo, Monaco, 'Courier New', monospace",

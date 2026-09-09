@@ -20,6 +20,42 @@
     "when": "terminalFocus"
   },
   {
+    "key": "ctrl+alt+left",
+    "command": "runCommands",
+    "args": { "commands": ["workbench.action.focusSideBar", "workbench.action.decreaseViewSize", "workbench.action.terminal.focus"] },
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+alt+right",
+    "command": "runCommands",
+    "args": { "commands": ["workbench.action.focusSideBar", "workbench.action.increaseViewSize", "workbench.action.terminal.focus"] },
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+alt+left",
+    "command": "runCommands",
+    "args": { "commands": ["workbench.action.focusSideBar", "workbench.action.decreaseViewSize", "workbench.action.focusActiveEditorGroup"] },
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+right",
+    "command": "runCommands",
+    "args": { "commands": ["workbench.action.focusSideBar", "workbench.action.increaseViewSize", "workbench.action.focusActiveEditorGroup"] },
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+down",
+    "command": "runCommands",
+    "args": { "commands": ["workbench.action.terminal.focus", "workbench.action.decreaseViewSize", "workbench.action.focusActiveEditorGroup"] },
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+alt+up",
+    "command": "runCommands",
+    "args": { "commands": ["workbench.action.terminal.focus", "workbench.action.increaseViewSize", "workbench.action.focusActiveEditorGroup"] },
+    "when": "editorTextFocus"
+  },
+  {
     "key": "ctrl+b",
     "command": "metals.compile-cascade",
     "when": "editorTextFocus && editorLangId == 'scala'"
