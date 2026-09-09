@@ -8,5 +8,15 @@
     "key": "ctrl+shift+.",
     "command": "workbench.action.increaseViewSize",
     "when": "sideBarFocus"
+  },
+  {
+    "key": "ctrl+shift+,",
+    "command": "workbench.action.decreaseViewSize",
+    "when": "terminalFocus"
+  },
+  {
+    "key": "ctrl+shift+.",
+    "command": "workbench.action.increaseViewSize",
+    "when": "terminalFocus"
   }
 ]
