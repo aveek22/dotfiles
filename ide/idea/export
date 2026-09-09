@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+# Bootstraps repo copies of the whole-directory areas (keymaps/colors/
+# templates/fileTemplates/codestyles) and curated options/*.xml files from
+# IntelliJ IDEA's live config directory (only once — never overwrites an
+# existing repo copy; only apply, via backup-then-symlink, changes that
+# afterward). Also unconditionally regenerates plugins.txt as a reference
+# snapshot — never installed/uninstalled by apply.
+set -euo pipefail
+
+repo_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$repo_dir/lib.sh"
+
+config_dir="$(idea_config_dir)" || exit 1
+
+# --- whole-directory areas: bootstrap only once, only if not already symlinked ---
+bootstrap_dir() {
+    local live_path="$1" repo_path="$2"
+    if [ -L "$live_path" ]; then
+        return 0  # already a symlink managed by apply — nothing to do
+    fi
+    if [ -d "$live_path" ] && [ -z "$(ls -A "$repo_path" 2>/dev/null)" ]; then
+        cp -R "$live_path/." "$repo_path/" 2>/dev/null || true
+        echo "idea-export: bootstrapped $repo_path from $live_path (edit the repo copy, then run ./apply)"
+    fi
+}
+
+for name in "${IDEA_WHOLE_DIRS[@]}"; do
+    mkdir -p "$repo_dir/$name"
+    bootstrap_dir "$config_dir/$name" "$repo_dir/$name"
+done
+
+# --- curated options/*.xml files: bootstrap only once ---
+bootstrap_file() {
+    local live_path="$1" repo_path="$2"
+    if [ -L "$live_path" ]; then
+        return 0
+    fi
+    if [ -f "$live_path" ] && [ ! -e "$repo_path" ]; then
+        cp "$live_path" "$repo_path"
+        echo "idea-export: bootstrapped $repo_path from $live_path (edit the repo copy, then run ./apply)"
+    fi
+}
+
+mkdir -p "$repo_dir/options"
+for name in "${IDEA_OPTION_FILES[@]}"; do
+    bootstrap_file "$config_dir/options/$name" "$repo_dir/options/$name"
+done
+
+# --- plugins.txt: always regenerated from the live install (reference only) ---
+if [ -d "$config_dir/plugins" ]; then
+    find "$config_dir/plugins" -mindepth 1 -maxdepth 1 -type d -exec basename {} \; | LC_ALL=C sort > "$repo_dir/plugins.txt"
+    echo "idea-export: wrote $(wc -l < "$repo_dir/plugins.txt" | tr -d ' ') plugin names to plugins.txt (reference only — not installed by apply)"
+fi
