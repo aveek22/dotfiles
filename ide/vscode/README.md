@@ -39,11 +39,18 @@ rather skip `make`.
 
 VS Code's `settings.json` has no variable substitution for arbitrary
 extension keys, so a path baked to one machine won't resolve on another.
-Currently nothing tracked here has that problem — `snyk.advanced.cliPath`
-was removed (the Snyk extension isn't used) and `black-formatter.path` was
-removed (its old value was malformed and inert anyway). If you add a
-setting with an absolute machine-specific path later, note it here.
+`snyk.advanced.cliPath` was removed entirely (the Snyk extension isn't
+used) and `black-formatter.path` was removed entirely (its old value was
+malformed and inert anyway) — both fine to just omit. Don't assume that's
+always safe, though: `todo-tree.ripgrep.ripgrep` was tried the same way on
+the assumption that an empty default meant auto-detection, but the
+extension actually needs it set — removing it broke Todo Tree with a
+"Failed to find vscode-ripgrep" warning on startup. Adjust the value below
+after `apply` on a different machine (Ubuntu, or an Intel Mac):
 
+- `todo-tree.ripgrep.ripgrep` — path to the `rg` binary. This machine:
+  `/opt/homebrew/bin/rg` (Homebrew, Apple Silicon). Ubuntu: wherever `rg`
+  actually lives there (e.g. `which rg`). Intel Mac: `/usr/local/bin/rg`.
 - `black-formatter.path` — add it back with a valid value if you want
   Black autoformatting; it's not tracked here right now.
 

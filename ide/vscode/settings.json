@@ -93,7 +93,6 @@
   "[yaml]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
   },
-  "database-client.autoSync": true,
   "aws.cloudformation.telemetry.enabled": false,
   "chat.instructionsFilesLocations": {
     ".github/instructions": true,
@@ -103,8 +102,6 @@
   },
   "git.enableSmartCommit": true,
   "gitlens.currentLine.fontSize": 12,
-  "gitblame.delayBlame": 50,
-  "gitblame.inlineMessageEnabled": true,
   "workbench.iconTheme": "material-icon-theme",
   "[github-actions-workflow]": {
     "editor.defaultFormatter": "redhat.vscode-yaml"
@@ -122,14 +119,7 @@
     "https://schemastore.azurewebsites.net/": true,
     "https://www.schemastore.org/": true
   },
-  "yaml.disableSchemaDetection": [
-    "**/.github/workflows/*.yml",
-    "**/.github/workflows/*.yaml",
-    "**/.gitea/workflows/*.yml",
-    "**/.gitea/workflows/*.yaml",
-    "**/.forgejo/workflows/*.yml",
-    "**/.forgejo/workflows/*.yaml"
-  ],
+  "yaml.disableSchemaDetection": [],
   "workbench.colorTheme": "Catppuccin Mocha",
   "evenBetterToml.formatter.indentEntries": true,
   "window.newWindowProfile": "Default",
