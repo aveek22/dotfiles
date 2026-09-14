@@ -79,5 +79,35 @@ class CurrentOsTests(unittest.TestCase):
             self.assertEqual(dc.current_os(), "other")
 
 
+class MakeDirWipeTargetTests(unittest.TestCase):
+    def test_absent_path_is_not_present_and_size_zero(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            missing = Path(tmp) / "does-not-exist"
+            target = dc.make_dir_wipe_target(
+                "poetry", "Poetry cache", dc.Tier.SAFE, lambda: missing
+            )
+            self.assertFalse(target.present_fn())
+            self.assertEqual(target.size_fn(), 0)
+
+    def test_present_path_reports_size_and_prunes(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            cache = Path(tmp) / "cache"
+            cache.mkdir()
+            (cache / "file.bin").write_bytes(b"x" * 200)
+            target = dc.make_dir_wipe_target(
+                "poetry", "Poetry cache", dc.Tier.SAFE, lambda: cache
+            )
+
+            self.assertTrue(target.present_fn())
+            self.assertEqual(target.size_fn(), 200)
+
+            message = target.prune_fn()
+
+            self.assertFalse(cache.exists())
+            self.assertIn("200B", message)
+            self.assertEqual(target.key, "poetry")
+            self.assertEqual(target.tier, dc.Tier.SAFE)
+
+
 if __name__ == "__main__":
     unittest.main()

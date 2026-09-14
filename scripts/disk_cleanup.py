@@ -9,7 +9,10 @@ full design and the safety invariant this script follows.
 import os
 import platform
 import shutil
+from dataclasses import dataclass
+from enum import Enum
 from pathlib import Path
+from typing import Callable, Optional
 
 
 def dir_size(path: Path) -> int:
@@ -64,3 +67,58 @@ def current_os() -> str:
     if system == "Linux":
         return "linux"
     return "other"
+
+
+class Tier(Enum):
+    SAFE = "safe"
+    DESTRUCTIVE = "destructive"
+
+
+@dataclass
+class Target:
+    """A prunable cleanup target. `size_fn`/`prune_fn`/`present_fn` are
+    zero-argument callables so discovery (Task 4) can bind each target to
+    a specific path/command without the caller needing to know how."""
+
+    key: str
+    label: str
+    tier: Tier
+    size_fn: Callable[[], int]
+    prune_fn: Callable[[], str]
+    present_fn: Callable[[], bool]
+    extra_report_fn: Optional[Callable[[], str]] = None
+
+
+@dataclass
+class InfoItem:
+    """A report-only item (pyenv/sdkman version installs). Never selectable,
+    never pruned by this script."""
+
+    label: str
+    size_fn: Callable[[], int]
+    present_fn: Callable[[], bool]
+
+
+def make_dir_wipe_target(
+    key: str, label: str, tier: Tier, path_fn: Callable[[], Path]
+) -> Target:
+    """Build a Target whose prune action is deleting an entire directory
+    tree outright. Used for pure download/build caches that the owning
+    tool recreates lazily on next use (Poetry, pip, npm, Maven, Gradle,
+    sbt/Ivy, Coursier, Terraform)."""
+
+    def present() -> bool:
+        return path_fn().exists()
+
+    def size() -> int:
+        return dir_size(path_fn())
+
+    def prune() -> str:
+        path = path_fn()
+        freed = dir_size(path)
+        shutil.rmtree(path, ignore_errors=True)
+        return f"removed {path} ({human_size(freed)})"
+
+    return Target(
+        key=key, label=label, tier=tier, size_fn=size, prune_fn=prune, present_fn=present
+    )
