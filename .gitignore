@@ -31,3 +31,7 @@ replay_pid*
 
 # Superpowers subagent-driven-development scratch workspace
 .superpowers/
+
+# Python bytecode cache
+__pycache__/
+*.pyc
