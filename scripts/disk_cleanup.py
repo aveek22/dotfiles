@@ -117,6 +117,8 @@ def make_dir_wipe_target(
 
     def prune() -> str:
         path = path_fn()
+        if path.is_symlink():
+            return f"skipped {path} (symlink, not followed)"
         freed = dir_size(path)
         shutil.rmtree(path, ignore_errors=True)
         return f"removed {path} ({human_size(freed)})"
@@ -158,6 +160,14 @@ def filter_by_keys(keys: list, targets: list) -> list:
     `targets`' original order."""
     key_set = set(keys)
     return [target for target in targets if target.key in key_set]
+
+
+def default_selection(targets: list) -> list:
+    """The safe-tier subset of `targets`, in original order. This is the
+    one place the safety invariant (destructive targets never run without
+    explicit naming) is encoded for the no-argument path -- used both by
+    --yes and as the interactive prompt's pre-selection."""
+    return [t for t in targets if t.tier is Tier.SAFE]
 
 
 _DIR_WIPE_SPECS = {
@@ -316,9 +326,8 @@ if it's wiped -- this script cannot detect that case automatically.
 
 
 def _print_report(targets: list, info_items: list) -> None:
-    present = [t for t in targets if t.present_fn()]
     print(f"{'#':>2}  {'target':<50} {'size':>8}  tier")
-    for index, target in enumerate(present, start=1):
+    for index, target in enumerate(targets, start=1):
         size = human_size(target.size_fn())
         tag = "⚠ destructive" if target.tier is Tier.DESTRUCTIVE else "safe"
         print(f"{index:>2}  {target.label:<50} {size:>8}  {tag}")
@@ -388,9 +397,9 @@ def main() -> None:
         keys = [k.strip() for k in args.only.split(",") if k.strip()]
         selected = filter_by_keys(keys, targets)
     elif args.yes:
-        selected = [t for t in targets if t.tier is Tier.SAFE]
+        selected = default_selection(targets)
     else:
-        preselected = [t for t in targets if t.tier is Tier.SAFE]
+        preselected = default_selection(targets)
         indices = ",".join(str(targets.index(t) + 1) for t in preselected)
         prompt = (
             f'\nSelected: {indices}. Press Enter to confirm, type new '
@@ -405,7 +414,8 @@ def main() -> None:
             return
 
         total = human_size(sum(t.size_fn() for t in selected))
-        confirm = input(f"\nWill prune {len(selected)} target(s), ~{total}. Proceed? [y/N] ")
+        names = ", ".join(t.label for t in selected)
+        confirm = input(f"\nWill prune {len(selected)} target(s) [{names}], ~{total}. Proceed? [y/N] ")
         if confirm.strip().lower() not in ("y", "yes"):
             print("Aborted, nothing changed.")
             return

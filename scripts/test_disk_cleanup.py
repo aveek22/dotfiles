@@ -108,6 +108,23 @@ class MakeDirWipeTargetTests(unittest.TestCase):
             self.assertEqual(target.key, "poetry")
             self.assertEqual(target.tier, dc.Tier.SAFE)
 
+    def test_symlinked_path_is_skipped_not_deleted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            real = Path(tmp) / "real_cache"
+            real.mkdir()
+            (real / "file.bin").write_bytes(b"x" * 50)
+            link = Path(tmp) / "link_cache"
+            link.symlink_to(real)
+
+            target = dc.make_dir_wipe_target(
+                "poetry", "Poetry cache", dc.Tier.SAFE, lambda: link
+            )
+            message = target.prune_fn()
+
+            self.assertIn("skipped", message)
+            self.assertTrue(real.exists())
+            self.assertEqual(dc.dir_size(real), 50)
+
 
 def _make_target(key, tier=dc.Tier.SAFE):
     return dc.Target(
@@ -165,6 +182,28 @@ class FilterByKeysTests(unittest.TestCase):
         self.assertEqual(dc.filter_by_keys(["nope"], targets), [])
 
 
+class DefaultSelectionTests(unittest.TestCase):
+    def test_excludes_destructive_targets(self):
+        targets = [
+            _make_target("poetry"),
+            _make_target("docker-volumes", tier=dc.Tier.DESTRUCTIVE),
+            _make_target("npm"),
+        ]
+        result = dc.default_selection(targets)
+        self.assertEqual([t.key for t in result], ["poetry", "npm"])
+
+    def test_filter_by_keys_can_still_return_a_named_destructive_target(self):
+        # The other half of the invariant: explicit naming (via --only) IS
+        # allowed to reach a destructive target -- only the *default*
+        # selection excludes them.
+        targets = [
+            _make_target("poetry"),
+            _make_target("trash", tier=dc.Tier.DESTRUCTIVE),
+        ]
+        result = dc.filter_by_keys(["trash"], targets)
+        self.assertEqual([t.key for t in result], ["trash"])
+
+
 class BuildTargetsTests(unittest.TestCase):
     def test_mac_includes_brew_not_apt(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -212,6 +251,38 @@ class BuildTargetsTests(unittest.TestCase):
 
             self.assertTrue((m2 / "settings.xml").exists())
             self.assertFalse(repo.exists())
+
+    def test_protected_sibling_paths_are_never_touched(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            protected = [
+                home / ".m2" / "settings.xml",
+                home / ".gradle" / "wrapper" / "marker",
+                home / ".gradle" / "daemon" / "marker",
+                home / ".ivy2" / "local" / "marker",
+            ]
+            for path in protected:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_text("keep")
+
+            wiped = [
+                home / ".m2" / "repository",
+                home / ".gradle" / "caches",
+                home / ".ivy2" / "cache",
+            ]
+            for path in wiped:
+                path.mkdir(parents=True)
+                (path / "some.jar").write_bytes(b"x" * 10)
+
+            targets = {t.key: t for t in dc.build_targets("mac", home)}
+            targets["maven"].prune_fn()
+            targets["gradle"].prune_fn()
+            targets["ivy2"].prune_fn()
+
+            for path in protected:
+                self.assertTrue(path.exists(), f"{path} should not have been touched")
+            for path in wiped:
+                self.assertFalse(path.exists(), f"{path} should have been wiped")
 
     def test_trash_wipes_contents_keeps_directory(self):
         with tempfile.TemporaryDirectory() as tmp:
