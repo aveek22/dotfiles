@@ -6,6 +6,7 @@ macOS and Ubuntu.
 See docs/superpowers/specs/2026-09-12-dev-disk-cleanup-design.md for the
 full design and the safety invariant this script follows.
 """
+import argparse
 import os
 import platform
 import shutil
@@ -300,3 +301,121 @@ def build_info_items(home: Path) -> list:
             present_fn=lambda: sdkman_candidates.exists(),
         ),
     ]
+
+
+_HELP_EPILOGUE = """\
+Safety note: destructive-tier targets (Docker volumes, Trash contents) are
+never run by --yes alone -- you must name them explicitly, either as a
+number at the interactive prompt or via --only=<key>.
+
+Caveat: Maven/Gradle/sbt/Ivy caches are pure download caches EXCEPT for
+artifacts installed locally with no upstream source (e.g. Maven's
+`install:install-file`). Those live only in ~/.m2/repository and are lost
+if it's wiped -- this script cannot detect that case automatically.
+"""
+
+
+def _print_report(targets: list, info_items: list) -> None:
+    present = [t for t in targets if t.present_fn()]
+    print(f"{'#':>2}  {'target':<50} {'size':>8}  tier")
+    for index, target in enumerate(present, start=1):
+        size = human_size(target.size_fn())
+        tag = "⚠ destructive" if target.tier is Tier.DESTRUCTIVE else "safe"
+        print(f"{index:>2}  {target.label:<50} {size:>8}  {tag}")
+        if target.extra_report_fn is not None:
+            detail = target.extra_report_fn()
+            if detail:
+                print(f"      {detail}")
+
+    present_info = [i for i in info_items if i.present_fn()]
+    if present_info:
+        print("\nInformational only (not prunable here):")
+        for item in present_info:
+            print(f"    {item.label}: {human_size(item.size_fn())}")
+
+
+def _run_selected(selected: list) -> None:
+    # Directory-wipe targets embed the freed amount in their own returned
+    # message; command-driven targets (docker/brew/apt) print the tool's
+    # own report instead. Either way there's nothing to sum here -- just
+    # surface each target's message as it runs.
+    for target in selected:
+        print(f"\n--- {target.label} ---")
+        print(target.prune_fn() or "(done)")
+    print("\nDone. See per-target output above for space freed.")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(
+        prog="disk-cleanup",
+        description="Report on and interactively prune dev-tool caches.",
+        epilog=_HELP_EPILOGUE,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument(
+        "--dry-run", action="store_true", help="Print the size report and exit."
+    )
+    parser.add_argument(
+        "--list", action="store_true", help="Print target keys/labels/tiers and exit."
+    )
+    parser.add_argument(
+        "--yes", "-y", action="store_true",
+        help="Skip the prompt and prune every present safe-tier target.",
+    )
+    parser.add_argument(
+        "--only", default=None,
+        help="Comma-separated target keys to prune (naming a destructive key is its explicit opt-in).",
+    )
+    args = parser.parse_args()
+
+    os_name = current_os()
+    home = Path.home()
+    targets = [t for t in build_targets(os_name, home) if t.present_fn()]
+    info_items = build_info_items(home)
+
+    if args.list:
+        for target in targets:
+            tag = "destructive" if target.tier is Tier.DESTRUCTIVE else "safe"
+            print(f"{target.key}\t{tag}\t{target.label}")
+        return
+
+    _print_report(targets, info_items)
+
+    if args.dry_run:
+        return
+
+    if args.only:
+        keys = [k.strip() for k in args.only.split(",") if k.strip()]
+        selected = filter_by_keys(keys, targets)
+    elif args.yes:
+        selected = [t for t in targets if t.tier is Tier.SAFE]
+    else:
+        preselected = [t for t in targets if t.tier is Tier.SAFE]
+        indices = ",".join(str(targets.index(t) + 1) for t in preselected)
+        prompt = (
+            f'\nSelected: {indices}. Press Enter to confirm, type new '
+            'comma-separated numbers to change (e.g. "1,3,9"), "a" for all '
+            '(including ⚠ destructive), or "q" to quit: '
+        )
+        raw = input(prompt)
+        selected = preselected if raw.strip() == "" else parse_selection(raw, targets)
+
+        if not selected:
+            print("Nothing selected, exiting.")
+            return
+
+        total = human_size(sum(t.size_fn() for t in selected))
+        confirm = input(f"\nWill prune {len(selected)} target(s), ~{total}. Proceed? [y/N] ")
+        if confirm.strip().lower() not in ("y", "yes"):
+            print("Aborted, nothing changed.")
+            return
+
+    if not selected:
+        print("Nothing selected, exiting.")
+        return
+
+    _run_selected(selected)
+
+
+if __name__ == "__main__":
+    main()
