@@ -90,6 +90,7 @@ alias cifailed="ap && python /Users/adas/codebase/work/profilers/profile-service
 # Kubernetes
 alias k="kubectl"
 alias kube="~/dotfiles/scripts/kube"
+alias cleanup="~/dotfiles/scripts/disk-cleanup"
 alias kp="kubectl config use-context rs-prod"
 alias kt="kubectl config use-context rs-test"
 

@@ -27,6 +27,7 @@ Install Homebrew packages: `brew bundle --file=brew/Brewfile`
 | `ide/vscode/`      | VS Code settings/keybindings/snippets (live symlinks) + extensions.txt (installed via `ide/vscode/apply`) |
 | `brew/Brewfile`    | Homebrew formulae and casks                                                                        |
 | `scripts/kube`     | Interactive script to update kubeconfig and open k9s for one of the three EKS clusters             |
+| `scripts/disk-cleanup` | Interactive disk-space cleanup for dev-tool caches (Docker, Poetry, pip, npm, Maven, Gradle, sbt/Ivy, Coursier, Terraform, Homebrew/apt, Trash) — logic in `scripts/disk_cleanup.py`, aliased as `cleanup` |
 | `itermcolors/`     | iTerm2 colour scheme `.itermcolors` files — import manually via iTerm2 preferences                 |
 
 ## Alias conventions in `home/.alias`
