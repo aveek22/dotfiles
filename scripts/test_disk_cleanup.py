@@ -109,5 +109,61 @@ class MakeDirWipeTargetTests(unittest.TestCase):
             self.assertEqual(target.tier, dc.Tier.SAFE)
 
 
+def _make_target(key, tier=dc.Tier.SAFE):
+    return dc.Target(
+        key=key,
+        label=key,
+        tier=tier,
+        size_fn=lambda: 0,
+        prune_fn=lambda: "",
+        present_fn=lambda: True,
+    )
+
+
+class ParseSelectionTests(unittest.TestCase):
+    def setUp(self):
+        self.targets = [
+            _make_target("poetry"),
+            _make_target("npm"),
+            _make_target("docker-volumes", tier=dc.Tier.DESTRUCTIVE),
+        ]
+
+    def test_digit_indices_select_in_order(self):
+        result = dc.parse_selection("1,3", self.targets)
+        self.assertEqual([t.key for t in result], ["poetry", "docker-volumes"])
+
+    def test_all_selects_every_target(self):
+        result = dc.parse_selection("a", self.targets)
+        self.assertEqual(result, self.targets)
+
+    def test_all_word_also_works(self):
+        result = dc.parse_selection("all", self.targets)
+        self.assertEqual(result, self.targets)
+
+    def test_quit_raises_system_exit(self):
+        with self.assertRaises(SystemExit) as ctx:
+            dc.parse_selection("q", self.targets)
+        self.assertEqual(ctx.exception.code, 0)
+
+    def test_invalid_and_out_of_range_tokens_are_ignored(self):
+        result = dc.parse_selection("0,2,9,abc", self.targets)
+        self.assertEqual([t.key for t in result], ["npm"])
+
+    def test_whitespace_and_case_are_tolerated(self):
+        result = dc.parse_selection(" 1 , 2 ", self.targets)
+        self.assertEqual([t.key for t in result], ["poetry", "npm"])
+
+
+class FilterByKeysTests(unittest.TestCase):
+    def test_keeps_order_and_drops_unmatched(self):
+        targets = [_make_target("poetry"), _make_target("npm"), _make_target("maven")]
+        result = dc.filter_by_keys(["maven", "poetry"], targets)
+        self.assertEqual([t.key for t in result], ["poetry", "maven"])
+
+    def test_unknown_key_yields_empty(self):
+        targets = [_make_target("poetry")]
+        self.assertEqual(dc.filter_by_keys(["nope"], targets), [])
+
+
 if __name__ == "__main__":
     unittest.main()

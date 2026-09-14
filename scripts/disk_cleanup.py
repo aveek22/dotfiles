@@ -122,3 +122,37 @@ def make_dir_wipe_target(
     return Target(
         key=key, label=label, tier=tier, size_fn=size, prune_fn=prune, present_fn=present
     )
+
+
+def parse_selection(raw: str, targets: list) -> list:
+    """Parse a non-empty selection string against an ordered target list.
+
+    '(a|all)' selects every target, safe and destructive alike.
+    '(q|quit)' exits the process immediately (SystemExit(0)).
+    Otherwise `raw` is treated as comma-separated 1-based indices into
+    `targets`; invalid or out-of-range tokens are silently skipped.
+    Callers are responsible for handling an *empty* raw string themselves
+    (this function assumes there's something to parse).
+    """
+    cleaned = raw.strip().lower()
+    if cleaned in ("q", "quit"):
+        raise SystemExit(0)
+    if cleaned in ("a", "all"):
+        return list(targets)
+
+    selected = []
+    for part in cleaned.split(","):
+        part = part.strip()
+        if not part.isdigit():
+            continue
+        index = int(part) - 1
+        if 0 <= index < len(targets):
+            selected.append(targets[index])
+    return selected
+
+
+def filter_by_keys(keys: list, targets: list) -> list:
+    """Return the subset of `targets` whose `.key` is in `keys`, preserving
+    `targets`' original order."""
+    key_set = set(keys)
+    return [target for target in targets if target.key in key_set]
