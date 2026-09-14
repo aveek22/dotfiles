@@ -28,3 +28,6 @@ replay_pid*
 **.idea/
 **.vscode/
 **.DS_Store
+
+# Superpowers subagent-driven-development scratch workspace
+.superpowers/
