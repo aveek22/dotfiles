@@ -9,6 +9,7 @@ full design and the safety invariant this script follows.
 import os
 import platform
 import shutil
+import subprocess
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -156,3 +157,146 @@ def filter_by_keys(keys: list, targets: list) -> list:
     `targets`' original order."""
     key_set = set(keys)
     return [target for target in targets if target.key in key_set]
+
+
+_DIR_WIPE_SPECS = {
+    "mac": [
+        ("poetry", "Poetry cache + virtualenvs", "Library/Caches/pypoetry"),
+        ("pip", "pip cache", "Library/Caches/pip"),
+        ("npm", "npm cache", ".npm"),
+        ("maven", "Maven repository cache", ".m2/repository"),
+        ("gradle", "Gradle caches", ".gradle/caches"),
+        ("ivy2", "sbt/Ivy dependency cache", ".ivy2/cache"),
+        ("sbt-boot", "sbt launcher/boot cache", ".sbt/boot"),
+        ("coursier", "Coursier cache", "Library/Caches/Coursier"),
+        ("terraform", "Terraform provider plugin cache", ".terraform.d/plugin-cache"),
+    ],
+    "linux": [
+        ("poetry", "Poetry cache + virtualenvs", ".cache/pypoetry"),
+        ("pip", "pip cache", ".cache/pip"),
+        ("npm", "npm cache", ".npm"),
+        ("maven", "Maven repository cache", ".m2/repository"),
+        ("gradle", "Gradle caches", ".gradle/caches"),
+        ("ivy2", "sbt/Ivy dependency cache", ".ivy2/cache"),
+        ("sbt-boot", "sbt launcher/boot cache", ".sbt/boot"),
+        ("coursier", "Coursier cache", ".cache/coursier"),
+        ("terraform", "Terraform provider plugin cache", ".terraform.d/plugin-cache"),
+    ],
+}
+
+
+def _run(cmd: list) -> str:
+    """Run `cmd`, returning combined stdout+stderr (stripped). Never raises
+    on a non-zero exit -- callers only care about the human-readable
+    output, not the return code."""
+    result = subprocess.run(cmd, capture_output=True, text=True)
+    return (result.stdout + result.stderr).strip()
+
+
+def _docker_daemon_running() -> bool:
+    result = subprocess.run(["docker", "info"], capture_output=True, text=True)
+    return result.returncode == 0
+
+
+def _apt_autoremove_preview() -> str:
+    return _run(["apt-get", "autoremove", "--dry-run"])
+
+
+def build_targets(os_name: str, home: Path) -> list:
+    """Build the full list of prunable Targets for this machine. Anything
+    not applicable to `os_name`, or whose underlying tool isn't installed,
+    still appears in the list but with `present_fn()` returning False --
+    callers filter on that before displaying/selecting."""
+    targets = []
+
+    for key, label, rel_path in _DIR_WIPE_SPECS.get(os_name, []):
+        targets.append(
+            make_dir_wipe_target(
+                key, label, Tier.SAFE, (lambda h=home, r=rel_path: h / r)
+            )
+        )
+
+    def docker_present() -> bool:
+        return shutil.which("docker") is not None and _docker_daemon_running()
+
+    targets.append(
+        Target(
+            key="docker-safe",
+            label="Docker: stopped containers, unused images, build cache",
+            tier=Tier.SAFE,
+            size_fn=lambda: 0,  # docker reports its own reclaimed size after pruning
+            prune_fn=lambda: _run(["docker", "system", "prune", "-af"]),
+            present_fn=docker_present,
+        )
+    )
+    targets.append(
+        Target(
+            key="docker-volumes",
+            label="Docker: unused volumes",
+            tier=Tier.DESTRUCTIVE,
+            size_fn=lambda: 0,
+            prune_fn=lambda: _run(["docker", "volume", "prune", "-f"]),
+            present_fn=docker_present,
+        )
+    )
+
+    trash_path = home / ".Trash" if os_name == "mac" else home / ".local" / "share" / "Trash"
+    targets.append(
+        Target(
+            key="trash",
+            label="Trash contents",
+            tier=Tier.DESTRUCTIVE,
+            size_fn=lambda: dir_size(trash_path),
+            prune_fn=lambda: f"emptied {trash_path} ({human_size(wipe_dir_contents(trash_path))})",
+            present_fn=lambda: trash_path.exists(),
+        )
+    )
+
+    if os_name == "mac":
+        brew_cache = home / "Library" / "Caches" / "Homebrew"
+        targets.append(
+            Target(
+                key="brew",
+                label="Homebrew old versions + cache",
+                tier=Tier.SAFE,
+                size_fn=lambda: dir_size(brew_cache),
+                prune_fn=lambda: _run(["brew", "cleanup", "-s"]),
+                present_fn=lambda: shutil.which("brew") is not None,
+            )
+        )
+    elif os_name == "linux":
+        apt_cache = Path("/var/cache/apt/archives")
+        targets.append(
+            Target(
+                key="apt",
+                label="apt package cache + unneeded auto-installed packages",
+                tier=Tier.SAFE,
+                size_fn=lambda: dir_size(apt_cache),
+                prune_fn=lambda: _run(["sudo", "apt-get", "clean"])
+                + "\n"
+                + _run(["sudo", "apt-get", "autoremove", "-y"]),
+                present_fn=lambda: shutil.which("apt-get") is not None,
+                extra_report_fn=_apt_autoremove_preview,
+            )
+        )
+
+    return targets
+
+
+def build_info_items(home: Path) -> list:
+    """Build the report-only info items: pyenv/sdkman installed-version
+    sizes. Never selectable, never pruned by this script."""
+    pyenv_versions = home / ".pyenv" / "versions"
+    sdkman_candidates = home / ".sdkman" / "candidates"
+    return [
+        InfoItem(
+            label="pyenv installed Python versions (not pruned here)",
+            size_fn=lambda: dir_size(pyenv_versions),
+            present_fn=lambda: pyenv_versions.exists(),
+        ),
+        InfoItem(
+            label="sdkman installed candidates (not pruned here)",
+            size_fn=lambda: dir_size(sdkman_candidates),
+            present_fn=lambda: sdkman_candidates.exists(),
+        ),
+    ]

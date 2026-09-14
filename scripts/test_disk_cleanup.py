@@ -165,5 +165,83 @@ class FilterByKeysTests(unittest.TestCase):
         self.assertEqual(dc.filter_by_keys(["nope"], targets), [])
 
 
+class BuildTargetsTests(unittest.TestCase):
+    def test_mac_includes_brew_not_apt(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            targets = dc.build_targets("mac", Path(tmp))
+            keys = [t.key for t in targets]
+            self.assertIn("brew", keys)
+            self.assertNotIn("apt", keys)
+
+    def test_linux_includes_apt_not_brew(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            targets = dc.build_targets("linux", Path(tmp))
+            keys = [t.key for t in targets]
+            self.assertIn("apt", keys)
+            self.assertNotIn("brew", keys)
+
+    def test_common_dir_wipe_keys_present_on_both_os(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            common_keys = {
+                "poetry", "pip", "npm", "maven", "gradle",
+                "ivy2", "sbt-boot", "coursier", "terraform",
+            }
+            for os_name in ("mac", "linux"):
+                keys = {t.key for t in dc.build_targets(os_name, Path(tmp))}
+                self.assertTrue(common_keys.issubset(keys), os_name)
+
+    def test_docker_and_trash_tiers(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            targets = {t.key: t for t in dc.build_targets("mac", Path(tmp))}
+            self.assertEqual(targets["docker-safe"].tier, dc.Tier.SAFE)
+            self.assertEqual(targets["docker-volumes"].tier, dc.Tier.DESTRUCTIVE)
+            self.assertEqual(targets["trash"].tier, dc.Tier.DESTRUCTIVE)
+
+    def test_maven_target_never_touches_settings_xml(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            m2 = home / ".m2"
+            m2.mkdir()
+            (m2 / "settings.xml").write_text("<settings/>")
+            repo = m2 / "repository"
+            repo.mkdir()
+            (repo / "some.jar").write_bytes(b"x" * 10)
+
+            targets = {t.key: t for t in dc.build_targets("mac", home)}
+            targets["maven"].prune_fn()
+
+            self.assertTrue((m2 / "settings.xml").exists())
+            self.assertFalse(repo.exists())
+
+    def test_trash_wipes_contents_keeps_directory(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            real_trash = home / ".Trash"
+            real_trash.mkdir()
+            (real_trash / "deleted.txt").write_bytes(b"x" * 5)
+
+            targets = {t.key: t for t in dc.build_targets("mac", home)}
+            targets["trash"].prune_fn()
+
+            self.assertTrue(real_trash.exists())
+            self.assertEqual(list(real_trash.iterdir()), [])
+
+
+class BuildInfoItemsTests(unittest.TestCase):
+    def test_reports_pyenv_and_sdkman_sizes_without_pruning(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            home = Path(tmp)
+            versions = home / ".pyenv" / "versions" / "3.11.0"
+            versions.mkdir(parents=True)
+            (versions / "python").write_bytes(b"x" * 30)
+
+            items = dc.build_info_items(home)
+            pyenv_item = next(i for i in items if "pyenv" in i.label.lower())
+
+            self.assertTrue(pyenv_item.present_fn())
+            self.assertEqual(pyenv_item.size_fn(), 30)
+            self.assertFalse(hasattr(pyenv_item, "prune_fn"))
+
+
 if __name__ == "__main__":
     unittest.main()
